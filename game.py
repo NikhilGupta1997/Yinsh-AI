@@ -28,7 +28,7 @@ class Game:
         el = self.driver.find_elements_by_id("PieceLayer")
         action = webdriver.common.action_chains.ActionChains(self.driver)
         if (hexagon == 0) :
-                action.move_to_element_with_offset(el[0], 438, 438)
+                action.move_to_element_with_offset(el[0], self.centerx, self.centery)
         else :
             if (point % hexagon == 0) :
                 pt_coord = self.get_corner_coord(point / hexagon, hexagon)
