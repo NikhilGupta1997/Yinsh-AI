@@ -224,10 +224,10 @@ def game_loop(game, args):
 	print 'You are player ' + str(player_id)
 	print 'You are alloted a time of ' + str(game_timer) + 's\n'
 	client.SendData2Process(server_string)
-	if args.mode == 'GUI':
-		game.render_board.render(game)
-	elif args.mode == 'CUI':
-		game.render()
+	# if args.mode == 'GUI':
+		# game.render_board.render(game)
+	# elif args.mode == 'CUI':
+		# game.render()
 	if player_id == '2':
 		move = client.RecvDataFromServer()
 		if move:
@@ -253,28 +253,33 @@ def game_loop(game, args):
 			message['action'] = 'KILLPROC'
 			message['meta'] = 'INVALID MOVE BY PLAYER ' + player_id
 			print 'INVALID MOVE ON THIS CLIENT'
-		elif success == 2 or success == 3 or success == 4:
+		# elif success == 2 or success == 3 or success == 4:
 			# 2 : Player 1 wins
 			# 3 : Player 2 wins
 			# 4 : Game Drawn
+                elif success == 2 or success == 3:
+			# 2 : You win
+			# 3 : Game Drawn # Need to handle this later
 			score = "(" + str(game.calculate_score(0) ) + "," + str(game.calculate_score(1) ) + ")"
 			message['action'] = 'FINISH'
-			message['data'] = move['data']
-			if success == 2:
-				message['meta'] = '1 wins WITH SCORE : '+score
-				if(player_id == '1'):
-					print 'YOU WIN!'
-				else:
-					print 'YOU LOSE :('
-			elif success == 3:
-				message['meta'] = '2 wins WITH SCORE : '+score
-				if(player_id == '2'):
-					print 'YOU WIN!'
-				else:
-					print 'YOU LOSE :('
-			else:
-				message['meta'] = 'Game Drawn WITH SCORE : '+score
-				print 'GAME DRAWN'
+                        message['data'] = move['data']
+                        if success == 2:
+                            print 'YOU WIN!'
+			# if success == 2:
+				# message['meta'] = '1 wins WITH SCORE : '+score
+				# if(player_id == '1'):
+					# print 'YOU WIN!'
+				# else:
+					# print 'YOU LOSE :('
+			# elif success == 3:
+				# message['meta'] = '2 wins WITH SCORE : '+score
+				# if(player_id == '2'):
+					# print 'YOU WIN!'
+				# else:
+					# print 'YOU LOSE :('
+			# else:
+				# message['meta'] = 'Game Drawn WITH SCORE : '+score
+				# print 'GAME DRAWN'
 		elif success == 1:
 			message = move
 		client.SendData2Server(message)
@@ -285,24 +290,30 @@ def game_loop(game, args):
 			move = move.strip()
 			print "The other player played " + move
 			success = game.execute_move(move)
-			if success == 2 or success == 3 or success == 4:
-				# 2 : Player 1 wins
-				# 3 : Player 2 wins
-				# 4 : Game Drawn
-				if success == 2:						
-					if(player_id == '1'):
-						print 'YOU WIN!'
-					else:
-						print 'YOU LOSE :('
-				elif success == 3:						
-					if(player_id == '2'):
-						print 'YOU WIN!'
-					else:
-						print 'YOU LOSE :('
-				else :
-					print 'GAME DRAWN'
-				break
-			else:					
+			# if success == 2 or success == 3 or success == 4:
+				# # 2 : Player 1 wins
+				# # 3 : Player 2 wins
+				# # 4 : Game Drawn
+				# if success == 2:						
+					# if(player_id == '1'):
+						# print 'YOU WIN!'
+					# else:
+						# print 'YOU LOSE :('
+				# elif success == 3:						
+					# if(player_id == '2'):
+						# print 'YOU WIN!'
+					# else:
+						# print 'YOU LOSE :('
+				# else :
+					# print 'GAME DRAWN'
+				# break
+                        if success == 2 or success == 3:
+                                # 2 : You lose! 
+                                # 3 : Game Drawn
+                                if success == 2:						
+                                    print 'OTHER PLAYER WINS!'
+                                break
+                        else:					
 				client.SendData2Process(move)
 		else:
 			break
@@ -318,11 +329,12 @@ if __name__ == '__main__':
 	parser.add_argument('-mode', dest = 'mode', type = str, default = 'GUI', help = 'How to render')
 	args = parser.parse_args()
 	game = Game(args.n, args.mode)
-	if args.mode != 'GUI':
-		game_loop(game, args)
-	else:
-		from threading import Thread
-		Th = Thread(target = lambda : game_loop(game, args))
-		Th.start()
-		game.init_display()
+        game_loop(game, args)
+	# if args.mode != 'GUI':
+		# game_loop(game, args)
+	# else:
+		# from threading import Thread
+		# Th = Thread(target = lambda : game_loop(game, args))
+		# Th.start()
+		# game.init_display()
 		game.display.mainloop()
