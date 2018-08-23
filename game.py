@@ -4,7 +4,8 @@ from selenium import webdriver
 
 driver = webdriver.Firefox()
 # we'll have to make this relative to work for everyone
-driver.get("file:/home/keshav/ta/ai/yinsh/Yinsh.html")
+absPath = os.path.abspath("Yinsh.html")
+driver.get("file:"+absPath)
 
 el=driver.find_elements_by_id("PieceLayer")
 
