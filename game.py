@@ -1,13 +1,15 @@
 from selenium import webdriver
 import math
 import numpy as np
+import os
 
 class Game:
 
     def __init__(self, n) :
         self.board_size = n
         self.driver = webdriver.Firefox()
-        self.driver.get("file:/home/keshav/ta/ai/yinsh/Yinsh.html")
+        abs_path = os.path.abspath('Yinsh.html')
+        self.driver.get("file:" + abs_path)
         self.spacing = 876.0/11
         self.centerx = 438
         self.centery = 438

@@ -41,6 +41,9 @@ player[1]={board_rings:0, rings_won:0, color:"#4F4F4F", current_ring:[-1,-1], fi
 */
 var required_move=0;
 
+// Variables for game.py
+var is_valid=false
+
 function SwitchPlayer(){
 	current_player=(current_player+1)%2;
 }
@@ -312,7 +315,10 @@ function PlaceRings(xcoord,ycoord){
 				required_move=1;
 		}
 		SwitchPlayer();
-	}
+        return true
+	} else {
+        return false
+    }
 }
 
 function BlackGuides(xcoord,ycoord,asign,bsign,guide){
@@ -362,7 +368,10 @@ function SelectRings(xcoord,ycoord){
 		BlackGuides(xcoord,ycoord,-1,0,true);
 		
 		required_move=2;
-	}
+        return true
+	} else {
+        return false
+    }
 }
 
 function RemoveBlackGuides(xring,yring,destx,desty,asign,bsign){
@@ -548,6 +557,7 @@ function MoveRings(xcoord,ycoord){
 		if(required_move!=3){
 			SwitchPlayer();
 		}
+        return true
 	}
 	else{
 		BlackGuides(player[current_player].current_ring[0],player[current_player].current_ring[1],1,1,false);
@@ -558,6 +568,7 @@ function MoveRings(xcoord,ycoord){
 		BlackGuides(player[current_player].current_ring[0],player[current_player].current_ring[1],-1,0,false);
 		guide_ctx.clearRect(0, 0, guide_canvas.width, guide_canvas.height);
 		required_move=1;
+        return false
 	}
 }
 
@@ -599,7 +610,10 @@ function RemoveRow(xcoord,ycoord){
 		required_move=4;
 
 		HighlightRow();
-	}
+        return true
+	} else {
+        return false
+    }
 
 
 }
@@ -635,7 +649,10 @@ function RemoveRing(xcoord,ycoord){
 			required_move=3;
 				HighlightRow();
 		}
-	}
+        return true
+	} else {
+        return false
+    }
 }
 
 function IsClickValid(mouse){
@@ -646,26 +663,23 @@ function IsClickValid(mouse){
 			}
 			if(positions[i][j].x-altitude/2<mouse.x&&positions[i][j].x+altitude/2>mouse.x
 				&&positions[i][j].y-altitude/2<mouse.y&&positions[i][j].y+altitude/2>mouse.y){
+                    valid = false
 					if(required_move==0){
-						PlaceRings(i,j);
-						
+						valid = PlaceRings(i,j);
 					}
 					else if(required_move==1){
-						SelectRings(i,j);
-						
+						valid = SelectRings(i,j);
 					}
 					else if(required_move==2){
-						MoveRings(i,j);
-						
+						valid = MoveRings(i,j);
 					}
 					else if(required_move==3){
-						RemoveRow(i,j);
-						
+						valid = RemoveRow(i,j);
 					}
 					else if(required_move==4){
-						RemoveRing(i,j);
-						
+						valid = RemoveRing(i,j);
 					}
+                    is_valid = valid
 			}
 		}
 	}
