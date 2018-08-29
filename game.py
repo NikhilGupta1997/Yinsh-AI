@@ -32,7 +32,7 @@ def create_index_html(size, rings, rows):
 
 class Game:
 
-    def __init__(self, n, mode):
+    def __init__(self, n, mode, time):
         if n in board_sizes:
             self.board_size = board_sizes[n]
             self.display_size = display_size[n]
@@ -43,6 +43,8 @@ class Game:
         create_index_html(self.display_size, n, self.board_size)
         chrome_options = Options()
         chrome_options.add_argument("--disable-infobars")
+        if mode != 'GUI':
+            chrome_options.add_argument('headless');
         self.driver = webdriver.Chrome(chrome_options=chrome_options)
         abs_path = os.path.abspath('Yinsh.html')
         self.driver.get("file:" + abs_path)
@@ -51,6 +53,8 @@ class Game:
         self.spacing = float(self.display_size)/self.board_size 
         self.centerx = int(self.display_size)/2
         self.centery = int(self.display_size)/2
+
+        self.timer = time # Useful to optimise bot strategy
 
     def get_corner_coord(self, corner, hexagon) :
         x_mov = self.spacing * hexagon * math.sin(math.radians(corner * 60))

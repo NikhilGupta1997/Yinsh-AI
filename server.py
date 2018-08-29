@@ -18,7 +18,7 @@ class Server:
         def setLogFile(self, filename):
                 self.log_file_handle = open(filename,'wb')
 
-        def BuildServer(self,port_no,num_clients):
+        def BuildServer(self,ip,port_no,num_clients):
                 """Builds The server on the port_number port_no for num_clients
                 Args:
                         port_no: (int) The port number
@@ -29,7 +29,7 @@ class Server:
                 s = socket.socket()
                 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                 s.settimeout(self.NETWORK_TIMER)
-                host = "0.0.0.0"
+                host = ip
                 self.port = port_no             
                 s.bind((host,port_no))
                 s.listen(5)
@@ -179,6 +179,7 @@ if __name__ == '__main__':
         local_Server = Server()
         parser = argparse.ArgumentParser(description = 'Yinsh Server')
         parser.add_argument('port', metavar = '10000', type = int, help = 'Server port')
+        parser.add_argument('-ip', dest = 'ip', type = str, default = '0.0.0.0', help = 'Server IP')
         parser.add_argument('-n', dest = 'n', metavar = 'N', type = int, default = 5, help = 'Yinsh board size')
         parser.add_argument('-NC', dest = 'num_clients', metavar = 'num_clients', type = int, default = 2, help = 'Number of clients connecting to the server')
         parser.add_argument('-TL', dest = 'time_limit', metavar = 'time_limit', type = int, default = 120, help = 'Time limit (in s)')
@@ -189,7 +190,7 @@ if __name__ == '__main__':
                 sys.exit()
         if args.log_file != '':
                 local_Server.setLogFile(args.log_file)
-        local_Server.BuildServer(args.port, args.num_clients)
+        local_Server.BuildServer(args.ip, args.port, args.num_clients)
         if(local_Server.client_count < 2):
                 local_Server.SendInitError2Clients()
         else:

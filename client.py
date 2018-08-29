@@ -203,7 +203,7 @@ class Client(Communicator):
                         super(Client,self).closeChildProcess()                                  
                 return success_flag
 
-def game_loop(game, args):
+def game_loop(args):
         client = Client()
         if args.exe.endswith('.py'):
                 client.CreateChildProcess('python', args.exe)
@@ -223,6 +223,8 @@ def game_loop(game, args):
         client.setGameTimer(game_timer)
         print 'You are player ' + str(player_id)
         print 'You are alloted a time of ' + str(game_timer) + 's\n'
+        game = Game(board_size, args.mode, game_timer)        
+
         client.SendData2Process(server_string)
         # if args.mode == 'GUI':
                 # game.render_board.render(game)
@@ -321,20 +323,10 @@ def game_loop(game, args):
         client.closeSocket()
 
 if __name__ == '__main__':
-        parser = argparse.ArgumentParser(description = 'Tak client')
+        parser = argparse.ArgumentParser(description = 'Yinsh client')
         parser.add_argument('ip', metavar = '0.0.0.0', type = str, help = 'Server IP')
         parser.add_argument('port', metavar = '10000', type = int, help = 'Server port')
         parser.add_argument('exe', metavar = 'run.sh', type = str, help = 'Your executable')
-        parser.add_argument('-n', dest = 'n', metavar = 'N', type = int, default = 5, help = 'Tak board size')
         parser.add_argument('-mode', dest = 'mode', type = str, default = 'GUI', help = 'How to render')
         args = parser.parse_args()
-        game = Game(args.n, args.mode)
-        game_loop(game, args)
-        # if args.mode != 'GUI':
-                # game_loop(game, args)
-        # else:
-                # from threading import Thread
-                # Th = Thread(target = lambda : game_loop(game, args))
-                # Th.start()
-                # game.init_display()
-                # game.display.mainloop()
+        game_loop(args)
