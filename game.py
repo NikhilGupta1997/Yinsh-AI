@@ -1,6 +1,7 @@
 import math
 import numpy as np
 import os
+import time
 
 from jinja2 import Environment, FileSystemLoader
 from selenium import webdriver
@@ -32,7 +33,7 @@ def create_index_html(size, rings, rows):
 
 class Game:
 
-    def __init__(self, n, mode, time):
+    def __init__(self, n, mode='CUI', time=120):
         if n in board_sizes:
             self.board_size = board_sizes[n]
             self.display_size = display_size[n]
@@ -64,7 +65,7 @@ class Game:
     def get_non_corner_coord(self, corner1, corner2, point_num_side, hexagon) :
         corner1_coord = self.get_corner_coord(corner1, hexagon)
         corner2_coord = self.get_corner_coord(corner2, hexagon)
-        return ((corner1_coord * point_num_side / hexagon) + (corner2_coord * (hexagon - point_num_side) / hexagon))
+        return ((corner1_coord * (hexagon - point_num_side) / hexagon) + (corner2_coord * point_num_side / hexagon))
 
     def click_at(self, hexagon, point) :
         el = self.driver.find_elements_by_id("PieceLayer")
@@ -84,9 +85,27 @@ class Game:
     def check_move_validity(self):
         return self.driver.execute_script('return is_valid;')
 
+    def check_player_state(self):
+        return self.driver.execute_script('return required_move;')
+
+    def get_current_player(self):
+        return self.driver.execute_script('return current_player;')
+
     def check_won(self):
         required_move = self.driver.execute_script('return required_move;')
         return required_move == 5
+
+    def execute_sequence(self, moves):
+        success = 1
+        move_list = []
+        for i, move in enumerate(moves):
+            if i % 5 == 4:
+                move_list += [move]
+                success = success and self.execute_move(' '.join(move_list))
+                move_list = []
+            else:
+                move_list += [move]
+        return success
 
     ## New suggested move types
     # P - Place a ring
@@ -96,6 +115,8 @@ class Game:
     # topmost point of hexagon is point 0 and pt number increase clockwise with 6*hexring pts on each hexagon
     def execute_move(self, cmd) :
         moves = cmd.split()
+        if len(moves) > 5:
+            return self.execute_sequence(moves)
         move_type = moves[0]
         moves = [int(m) for m in moves[1:]]
 
@@ -128,8 +149,46 @@ class Game:
         return success
 
 if __name__ == "__main__":
-    game = Game(5, 0)
+    game = Game(5, "GUI")
+    game.execute_move("P 2 0")
+    game.execute_move("P 5 16")
     game.execute_move("P 0 0")
-    game.execute_move("P 1 1")
-    game.execute_move("P 1 2")
+    game.execute_move("P 5 14")
+    game.execute_move("P 2 9")
+    game.execute_move("P 1 3")
+    game.execute_move("P 1 0")
+    game.execute_move("P 3 0")
+    game.execute_move("P 3 6")
+    game.execute_move("P 4 4")
+    game.execute_move("M 2 9 5 28")
+    game.execute_move("M 1 3 3 14")
+    game.execute_move("M 5 28 5 26")
+    game.execute_move("M 3 0 3 17")
+    game.execute_move("M 0 0 1 2")
+    game.execute_move("M 4 4 2 2")
+    game.execute_move("M 1 2 3 1")
+    game.execute_move("M 5 16 1 4")
+    game.execute_move("M 3 1 1 1")
+    game.execute_move("M 2 2 4 6")
+    game.execute_move("M 1 0 4 3")
+    game.execute_move("M 3 14 5 24")
+    game.execute_move("M 3 6 3 9")
+    game.execute_move("M 4 6 3 4")
+    game.execute_move("M 4 3 3 3")
+    game.execute_move("M 1 4 2 8")
+    game.execute_move("M 5 26 5 27")
+    game.execute_move("M 3 17 1 5")
+    game.execute_move("M 2 0 2 6")
+    game.execute_move("M 3 4 2 7")
+    game.execute_move("M 1 1 2 3")
+    game.execute_move("M 5 14 4 16")
+    game.execute_move("M 2 6 3 5")
+    game.execute_move("M 4 16 4 18")
+    game.execute_move("M 5 27 5 29")
+    game.execute_move("M 4 18 2 10")
+    game.execute_move("M 3 9 4 11")
+    game.execute_move("M 2 8 3 11")
+    # game.execute_move("M 4 11 2 1")
+    # game.execute_move("R 0 0 2 10")
+    # game.execute_move("M 3 3 0 0")
 

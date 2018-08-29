@@ -140,12 +140,11 @@ class Server:
                         None
                 """
                 if( (client_0 < len(self.communicator_list)) and (client_1) < len(self.communicator_list)):
-                        # dataString = '1 ' + str(n) + ' ' + str(timelimit)
                         dataString = '{id} {size} {time}'.format(id=1, size=n, time=timelimit)
                         data = {'meta':'', 'action':'INIT','data':dataString}
                         self.SendData2Client(client_0, json.dumps(data))
-                        # data['data'] = '2 ' + str(n) + ' ' + str(timelimit)
                         dataString = '{id} {size} {time}'.format(id=2, size=n, time=timelimit)
+                        data = {'meta':'', 'action':'INIT','data':dataString}
                         self.SendData2Client(client_1, json.dumps(data))                        
                         while(True):
                                 data = self.RecvDataFromClient(client_0)

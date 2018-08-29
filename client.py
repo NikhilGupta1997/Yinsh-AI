@@ -262,10 +262,11 @@ def game_loop(args):
                 elif success == 2 or success == 3:
                         # 2 : You win
                         # 3 : Game Drawn # Need to handle this later
-                        score = "(" + str(game.calculate_score(0) ) + "," + str(game.calculate_score(1) ) + ")"
+                        # score = "(" + str(game.calculate_score(0) ) + "," + str(game.calculate_score(1) ) + ")"
                         message['action'] = 'FINISH'
                         message['data'] = move['data']
                         if success == 2:
+                            message['meta'] = '1 wins WITH SCORE :'
                             print 'YOU WIN!'
                         # if success == 2:
                                 # message['meta'] = '1 wins WITH SCORE : '+score
@@ -292,6 +293,9 @@ def game_loop(args):
                         move = move.strip()
                         print "The other player played " + move
                         success = game.execute_move(move)
+                        if success == 2:
+                            message['meta'] = '2 wins WITH SCORE :'
+                            print 'YOU WIN!'
                         # if success == 2 or success == 3 or success == 4:
                                 # # 2 : Player 1 wins
                                 # # 3 : Player 2 wins
@@ -327,6 +331,6 @@ if __name__ == '__main__':
         parser.add_argument('ip', metavar = '0.0.0.0', type = str, help = 'Server IP')
         parser.add_argument('port', metavar = '10000', type = int, help = 'Server port')
         parser.add_argument('exe', metavar = 'run.sh', type = str, help = 'Your executable')
-        parser.add_argument('-mode', dest = 'mode', type = str, default = 'GUI', help = 'How to render')
+        parser.add_argument('-mode', dest = 'mode', type = str, default = 'CUI', help = 'How to render. Set to "GUI" mode to render, else set to "CUI"')
         args = parser.parse_args()
         game_loop(args)

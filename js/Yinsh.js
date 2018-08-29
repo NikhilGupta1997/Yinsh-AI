@@ -39,7 +39,7 @@ var player=new Array(2);
 player[0]={board_rings:0, rings_won:0, color:"#c47719", current_ring:[-1,-1], five_row:new Array(0)};
 player[1]={board_rings:0, rings_won:0, color:"#0a4fd8", current_ring:[-1,-1], five_row:new Array(0)};
 
-/*
+/* The game state for a player
 0-Place Rings
 1-Select Ring
 2-Move Ring
@@ -236,6 +236,8 @@ function BlackGuides(xcoord,ycoord,asign,bsign,guide){
 
 function SelectRings(xcoord,ycoord){
 	if(positions[xcoord][ycoord].piece==Math.pow(-1,current_player)*2){
+		console.log("SelectRings")
+		console.log(xcoord, ycoord)
 		guide_ctx.beginPath();
 		guide_ctx.strokeStyle="black";
 		guide_ctx.arc(positions[xcoord][ycoord].x,positions[xcoord][ycoord].y,altitude*3/10,0,Math.PI*2);
@@ -453,6 +455,8 @@ function HighlightRow(){
 
 function MoveRings(xcoord,ycoord){
 	if(positions[xcoord][ycoord].guide==true){
+		console.log("MoveRings")
+		console.log(xcoord, ycoord)
 		guide_ctx.clearRect(0, 0, guide_canvas.width, guide_canvas.height);
 		RemoveBlackGuides(player[current_player].current_ring[0],player[current_player].current_ring[1],xcoord,ycoord,1,1);
 		RemoveBlackGuides(player[current_player].current_ring[0],player[current_player].current_ring[1],xcoord,ycoord,1,0);
@@ -465,6 +469,7 @@ function MoveRings(xcoord,ycoord){
 		HighlightRow();
 		if(required_move!=3){
 			SwitchPlayer();
+			HighlightRow();
 		}
         return true
 	}
@@ -547,7 +552,7 @@ function RemoveRing(xcoord,ycoord){
 		else if(player[current_player].five_row.length==0){
 			SwitchPlayer();
 			if(player[current_player].five_row.length==0){
-				required_move=2;
+				required_move=1;
 			}
 			else{
 				required_move=3;
@@ -577,9 +582,11 @@ function IsClickValid(mouse){
 						valid = PlaceRings(i,j);
 					}
 					else if(required_move==1){
+						console.log('SelectRings')
 						valid = SelectRings(i,j);
 					}
 					else if(required_move==2){
+						console.log('MoveRings')
 						valid = MoveRings(i,j);
 					}
 					else if(required_move==3){
@@ -596,10 +603,10 @@ function IsClickValid(mouse){
 
 function getCanvasMousePosition (event) {
   var rect = piece_canvas.getBoundingClientRect();
-  console.log(rect.left)
-  console.log(rect.top)
-  console.log(event.clientX)
-  console.log(event.clientY)
+  // console.log(rect.left)
+  // console.log(rect.top)
+  // console.log(event.clientX)
+  // console.log(event.clientY)
   return {
     x: event.clientX - rect.left,
     y: event.clientY - rect.top
@@ -610,12 +617,7 @@ document.addEventListener('click', function(event) {
         lastDownTarget = event.target;
         if(lastDownTarget == piece_canvas||lastDownTarget == guide_canvas||lastDownTarget == game_canvas) {
         	var canvasMousePosition = getCanvasMousePosition(event);
-    		console.log(canvasMousePosition.x)
-			console.log(canvasMousePosition.y)
         	IsClickValid(canvasMousePosition);
-            /*game_ctx.beginPath();
-			game_ctx.arc(canvasMousePosition.x,canvasMousePosition.y,10,0,Math.PI*2);
-			game_ctx.stroke();*/
         }
     }, false);
 
