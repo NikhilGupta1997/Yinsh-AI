@@ -11,8 +11,8 @@ class RandomPlayer:
 		self.play()
 
 	def play(self):
-                player1_moves = ["! 0 0", "! 4 4", "! 4 6", "! 4 22", "! 4 20", "@ 0 0 3 9"]
-                player2_moves = ["! 4 18", "! 4 16", "! 4 14", "! 4 12", "! 4 9", "@ 4 16 1 1"]
+                player1_moves = ["P 0 0", "P 4 4", "P 4 6", "P 4 22", "P 4 20", "M 0 0 3 9"]
+                player2_moves = ["P 4 18", "P 4 16", "P 4 14", "P 4 12", "P 4 9", "M 4 16 1 1"]
 		if self.player == 1:
 			move = sys.stdin.readline().strip()
 			# self.game.execute_move(move)

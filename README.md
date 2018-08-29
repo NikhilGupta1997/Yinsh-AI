@@ -7,4 +7,6 @@ In case of more than 5 rings, click on the end marker, from where you want to st
 win > stale_win > draw > stale_loss > loss
 Check out - 2 rows overlapped at a point
 
+TODO: FIx issue when player makes other player's row
+
 Install selenium, gecko

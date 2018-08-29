@@ -1,4 +1,8 @@
-var dimension = [document.documentElement.clientWidth, document.documentElement.clientHeight];
+// var dimension = [document.documentElement.clientWidth, document.documentElement.clientHeight];
+var size = parseInt(document.currentScript.getAttribute('size'));
+var rings = parseInt(document.currentScript.getAttribute('rings'));
+var rows = parseInt(document.currentScript.getAttribute('rows'));
+var dimension = [ size , size ];
 
 var game_canvas = document.getElementById('GameBoard');
 game_canvas.width = dimension[1];
@@ -20,17 +24,20 @@ test_canvas.width = dimension[1];
 test_canvas.height = dimension[1];
 var test_ctx = test_canvas.getContext("2d");
 
+game_ctx.fillStyle = "#1999c4";
+game_ctx.fillRect(0, 0, game_canvas.width, game_canvas.height);
+
 var centerx = game_canvas.width/2;
 var centery = game_canvas.width/2;
 
-var spacing = game_canvas.height/11;
+var spacing = game_canvas.height/rows;
 var altitude=spacing*Math.sqrt(3)/2;
 
 var current_player=0;
 
 var player=new Array(2);
-player[0]={board_rings:0, rings_won:0, color:"#BBBBBB", current_ring:[-1,-1], five_row:new Array(0)};
-player[1]={board_rings:0, rings_won:0, color:"#4F4F4F", current_ring:[-1,-1], five_row:new Array(0)};
+player[0]={board_rings:0, rings_won:0, color:"#c47719", current_ring:[-1,-1], five_row:new Array(0)};
+player[1]={board_rings:0, rings_won:0, color:"#0a4fd8", current_ring:[-1,-1], five_row:new Array(0)};
 
 /*
 0-Place Rings
@@ -62,49 +69,39 @@ function Point(x, y) {
   this.guide=false;
 }
 
-var positions = new Array(11);
-for (var i = 0; i < 11; i++) {
-  positions[i] = new Array(11);
-}
-
-function LineTest(){
-	game_ctx.beginPath();
-	//game_ctx.moveTo(positions[i][begin].x,positions[i][begin].y);
-	//game_ctx.lineTo(positions[i][end].x,positions[i][end].y);
-	game_ctx.moveTo(0,0);
-	game_ctx.lineTo(100,100);
-	game_ctx.stroke();
+var positions = new Array(rows);
+for (var i = 0; i < rows; i++) {
+  positions[i] = new Array(rows);
 }
 
 function PlotPoints(){
-	for (var i = 0; i < 11; i++) 
-	{
+	for (var i = 0; i < rows; i++) {
+		var x=i-rings;
+		var low=-rings;
+		var high=rings;
 		
-
-		var x=i-5;
-		var low=-5;
-		var high=5;
 		if(x==0){
-			low=-4;
-			high=4;
+			low=-(rings-1); high=(rings-1);
 		}
-		if(x>=1&&x<=4){
-			low=-5+x;
+		
+		if(x>=1&&x<=(rings-1)){
+			low=-(rings)+x;
 		}
-		if(x==5){
-			low=1;
-			high=4;
-		}
-		if(x>=-4&&x<=-1){
-			high=5+x;
-		}
-		if(x==-5){
-			low=-4;
-			high=-1;
+		
+		if(x==(rings)){
+			low=1; high=(rings-1);
 		}
 
-		for(var j=0;j<11;j++){
-			var y=j-5;
+		if(x>=-(rings-1)&&x<=-1){
+			high=rings+x;
+		}
+
+		if(x==-(rings)){
+			low=-(rings-1); high=-1;
+		}
+
+		for(var j=0;j<rows;j++){
+			var y=j-(rings);
 			
 			if(!(y>=low&&y<=high)){
 				positions[i][j]= new Point(-1,-1);
@@ -115,31 +112,30 @@ function PlotPoints(){
 			positions[i][j].valid=true;
 		}
 	}
-	
 }
 
 function DrawBoardLines(){
-	for(var i=0;i<11;i++){
+	for(var i=0;i<rows;i++){
 		var begin=0;
-		var end=10;
+		var end=rows-1;
 		var j=0;
 
-		while(positions[i][j].x==-1&&j<11){
+		while(positions[i][j].x==-1&&j<rows){
 			j++;
-			if(j==11){
+			if(j==rows){
 				break;
 			}
 		}
 		begin=j;
-		while(positions[i][j].x!=-1&&j<11){
+		while(positions[i][j].x!=-1&&j<rows){
 			j++;
-			if(j==11){
+			if(j==rows){
 				break;
 			}
 		}
 		end=j-1;
 		game_ctx.beginPath();
-		game_ctx.strokeStyle="#888888";
+		game_ctx.strokeStyle="#ffffff";
 		game_ctx.moveTo(positions[i][begin].x,positions[i][begin].y);
 		game_ctx.lineTo(positions[i][end].x,positions[i][end].y);
 		//game_ctx.moveTo(0,0);
@@ -147,21 +143,21 @@ function DrawBoardLines(){
 		game_ctx.stroke();
 		
 	}
-	for(var j=0;j<11;j++){
+	for(var j=0;j<rows;j++){
 		var begin=0;
-		var end=10;
+		var end=rows-1;
 		var i=0;
 
-		while(positions[i][j].x==-1&&i<11){
+		while(positions[i][j].x==-1&&i<rows){
 			i++;
-			if(i==11){
+			if(i==rows){
 				break;
 			}
 		}
 		begin=i;
-		while(positions[i][j].x!=-1&&i<11){
+		while(positions[i][j].x!=-1&&i<rows){
 			i++;
-			if(i==11){
+			if(i==rows){
 				break;
 			}
 		}
@@ -175,14 +171,14 @@ function DrawBoardLines(){
 		
 	}
 
-	for(var i=0;i<11;i++){
-		for(var j=0;j<11;j++){
-			var x=i-5;
-			var y=j-5;
-			if(Math.abs(x)==5||(x==-4&&y==-4)||(x==-4&&y==1)||(x==1&&y==-4)){
+	for(var i=0;i<rows;i++){
+		for(var j=0;j<rows;j++){
+			var x=i-rings;
+			var y=j-rings;
+			if(Math.abs(x)==rings||(x==-(rings-1)&&y==-(rings-1))||(x==-(rings-1)&&y==1)||(x==1&&y==-(rings-1))){
 				game_ctx.beginPath();
 				game_ctx.moveTo(positions[i][j].x,positions[i][j].y);
-				game_ctx.lineTo(positions[5-y][5-x].x,positions[5-y][5-x].y);
+				game_ctx.lineTo(positions[rings-y][rings-x].x,positions[rings-y][rings-x].y);
 				//game_ctx.moveTo(0,0);
 				//game_ctx.lineTo(100,100);
 				game_ctx.stroke();
@@ -192,116 +188,12 @@ function DrawBoardLines(){
 	}
 }
 
-function ActualColor(){
-	test_ctx.clearRect(0, 0, test_canvas.width, test_canvas.height);
-	for(var i=0;i<11;i++){
-		for(var j=0;j<11;j++){
-
-			if(positions[i][j].x==-1){
-				continue;
-			}
-			test_ctx.beginPath();
-
-			test_ctx.strokeStyle="#444444";
-			if(positions[i][j].piece==0){
-				test_ctx.fillStyle = "#000000";
-			}
-			if(positions[i][j].piece==-1){
-				test_ctx.fillStyle = "#FF0000";
-			}
-			if(positions[i][j].piece==-2){
-				test_ctx.fillStyle = "#FF00FF";
-			}
-			if(positions[i][j].piece==1){
-				test_ctx.fillStyle = "#0000FF";
-			}
-			if(positions[i][j].piece==2){
-				test_ctx.fillStyle = "#00FFFF";
-			}
-			
-
-			test_ctx.arc(positions[i][j].x,positions[i][j].y,spacing/1.9,0,Math.PI*2);
-			test_ctx.globalAlpha = 0.5;
-			test_ctx.fill();			
-			test_ctx.stroke();
-
-			test_ctx.globalAlpha = 1.0
-			test_ctx.strokeStyle="#000000";
-		}
-	}
-}
-
-function ColorItUp(){
-
-	for(var i=0;i<11;i++){
-		for(var j=0;j<11;j++){
-
-			if(positions[i][j].x==-1){
-				continue;
-			}
-			ctx.beginPath();
-			if(i==0){
-				game_ctx.strokeStyle="#FF0000";
-			}
-			else if(i==1){
-				game_ctx.strokeStyle="#00FF00";
-			}
-			else if(i==2){
-				game_ctx.strokeStyle="#0000FF";
-			}
-			else if(i==3){
-				game_ctx.strokeStyle="#FFFF00";
-			}
-			else if(i==4){
-				game_ctx.strokeStyle="#00FFFF";
-			}
-			else if(i==5){
-				game_ctx.strokeStyle="#000000";
-			}
-			else if(i==6){
-				game_ctx.strokeStyle="#004400";
-			}
-			else if(i==7){
-				game_ctx.strokeStyle="#000044";
-			}
-			else if(i==8){
-				game_ctx.strokeStyle="#444400";
-			}
-			else if(i==9){
-				game_ctx.strokeStyle="#004444";
-			}
-			else if(i==10){
-				game_ctx.strokeStyle="#444444";
-			}
-
-			game_ctx.arc(positions[i][j].x,positions[i][j].y,10,0,Math.PI*2);
-			game_ctx.stroke();
-			if(j==6){
-				game_ctx.globalAlpha = 0.5;
-				game_ctx.fillStyle = "red";
-				game_ctx.fill();
-				game_ctx.globalAlpha = 1.0;
-			}
-			if(j==4){
-				game_ctx.globalAlpha = 0.5;
-				game_ctx.fillStyle = "blue";
-				game_ctx.fill();
-				game_ctx.globalAlpha = 1.0;
-			}
-			game_ctx.strokeStyle="#000000";
-		}
-	}
-}
-
-
-
 PlotPoints();
-//ColorItUp();
-
 DrawBoardLines();
-//LineTest();
 
 function PlaceRings(xcoord,ycoord){
+	console.log(xcoord)
+	console.log(ycoord)
 	if(positions[xcoord][ycoord].piece==0){
 		piece_ctx.beginPath();
 		piece_ctx.strokeStyle=player[current_player].color;
@@ -311,7 +203,7 @@ function PlaceRings(xcoord,ycoord){
 		piece_ctx.lineWidth=1;
 		positions[xcoord][ycoord].piece=Math.pow(-1,current_player)*2;
 		player[current_player].board_rings++;
-		if(player[current_player].board_rings==5&&player[(current_player+1)%2].board_rings==5){
+		if(player[current_player].board_rings==rings&&player[(current_player+1)%2].board_rings==rings){
 				required_move=1;
 		}
 		SwitchPlayer();
@@ -323,7 +215,7 @@ function PlaceRings(xcoord,ycoord){
 
 function BlackGuides(xcoord,ycoord,asign,bsign,guide){
 	var token_line=0;
-	for(var a=asign, b=bsign;xcoord+a>=0&&xcoord+a<11&&ycoord+b>=0&&ycoord+b<11
+	for(var a=asign, b=bsign;xcoord+a>=0&&xcoord+a<rows&&ycoord+b>=0&&ycoord+b<rows
 		&&Math.abs(positions[xcoord+a][ycoord+b].piece)!=2&&positions[xcoord+a][ycoord+b].x!=-1;a+=asign,b+=bsign){
 		if(positions[xcoord+a][ycoord+b].piece!=0){
 			token_line=1;
@@ -340,7 +232,6 @@ function BlackGuides(xcoord,ycoord,asign,bsign,guide){
 			break;
 		}
 	}
-
 }
 
 function SelectRings(xcoord,ycoord){
@@ -379,7 +270,7 @@ function RemoveBlackGuides(xring,yring,destx,desty,asign,bsign){
 	if(Math.sign(destx-xring)==Math.sign(asign)&&Math.sign(desty-yring)==Math.sign(bsign)){
 		flip=1;
 	}
-	for(var a=asign, b=bsign;xring+a>=0&&xring+a<11&&yring+b>=0&&yring+b<11
+	for(var a=asign, b=bsign;xring+a>=0&&xring+a<rows&&yring+b>=0&&yring+b<rows
 		&&Math.abs(positions[xring+a][yring+b].piece)!=2&&positions[xring+a][yring+b].x!=-1;a+=asign,b+=bsign){
 		if(positions[xring+a][yring+b].piece==0){
 			positions[xring+a][yring+b].guide=false;
@@ -450,13 +341,13 @@ function RemoveBlackGuides(xring,yring,destx,desty,asign,bsign){
 }
 
 function CheckRows(){
-	for(var i=0;i<11;i++){
-		for(var j=0;j+4<11;j++){
+	for(var i=0;i<rows;i++){
+		for(var j=0;j+rings-1<11;j++){
 			if(Math.abs(positions[i][j].piece)!=1||positions[i][j].x==-1)
 				continue;
 			var isrow=true;
-			for(var k=1;k<=4;k++){
-				if(positions[i][j].piece!=positions[i][j+k].piece||positions[i][j+k].x==-1||j+k>=11){
+			for(var k=1;k<=rings-1;k++){
+				if(positions[i][j].piece!=positions[i][j+k].piece||positions[i][j+k].x==-1||j+k>=rows){
 					isrow=false;
 					break;
 				}
@@ -469,17 +360,52 @@ function CheckRows(){
 			if(positions[i][j].piece==-1){
 				row_player++;
 			}
-			player[row_player].five_row.push([[i,j],[i,j+1],[i,j+2],[i,j+3],[i,j+4]]);
+			var list = [];
+			for(var k=0;k<rings;k++){
+				list.push([i,j+k])
+			}
+			player[row_player].five_row.push(list)
+			// player[row_player].five_row.push([[i,j],[i,j+1],[i,j+2],[i,j+3],[i,j+4]]);
+			// player[row_player].five_row.push([[i, j+k] for k in range(rings)]);
+			 
+		}
+	}
+	for(var i=0;i+rings-1<rows;i++){
+		for(var j=0;j<rows;j++){
+			if(Math.abs(positions[i][j].piece)!=1||positions[i][j].x==-1)
+				continue;
+			var isrow=true;
+			for(var k=1;k<=rings-1;k++){
+				if(positions[i][j].piece!=positions[i+k][j].piece||positions[i+k][j].x==-1||i+k>=rows){
+					isrow=false;
+					break;
+				}
+			}
+			if(isrow==false){
+				continue;
+			}
+			
+			var row_player=0;
+			if(positions[i][j].piece==-1){
+				row_player++;
+			}
+			// player[row_player].five_row.push([[i,j],[i+1,j],[i+2,j],[i+3,j],[i+4,j]]);
+			var list = [];
+			for(var k=0;k<rings;k++){
+				list.push([i+k,j])
+			}
+			player[row_player].five_row.push(list)
+			// player[row_player].five_row.push([[i+k, j] for k in range(rings)]);
 			
 		}
 	}
-	for(var i=0;i+4<11;i++){
-		for(var j=0;j<11;j++){
+	for(var i=0;i<rows;i++){
+		for(var j=0;j<rows;j++){
 			if(Math.abs(positions[i][j].piece)!=1||positions[i][j].x==-1)
 				continue;
 			var isrow=true;
-			for(var k=1;k<=4;k++){
-				if(positions[i][j].piece!=positions[i+k][j].piece||positions[i+k][j].x==-1||i+k>=11){
+			for(var k=1;k<=rings-1;k++){
+				if(i+k>=rows||j+k>=rows||positions[i][j].piece!=positions[i+k][j+k].piece||positions[i+k][j+k].x==-1){
 					isrow=false;
 					break;
 				}
@@ -492,30 +418,13 @@ function CheckRows(){
 			if(positions[i][j].piece==-1){
 				row_player++;
 			}
-			player[row_player].five_row.push([[i,j],[i+1,j],[i+2,j],[i+3,j],[i+4,j]]);
-			
-		}
-	}
-	for(var i=0;i<11;i++){
-		for(var j=0;j<11;j++){
-			if(Math.abs(positions[i][j].piece)!=1||positions[i][j].x==-1)
-				continue;
-			var isrow=true;
-			for(var k=1;k<=4;k++){
-				if(i+k>=11||j+k>=11||positions[i][j].piece!=positions[i+k][j+k].piece||positions[i+k][j+k].x==-1){
-					isrow=false;
-					break;
-				}
+			// player[row_player].five_row.push([[i,j],[i+1,j+1],[i+2,j+2],[i+3,j+3],[i+4,j+4]]);
+			var list = [];
+			for(var k=0;k<rings;k++){
+				list.push([i+k,j+k])
 			}
-			if(isrow==false){
-				continue;
-			}
-			
-			var row_player=0;
-			if(positions[i][j].piece==-1){
-				row_player++;
-			}
-			player[row_player].five_row.push([[i,j],[i+1,j+1],[i+2,j+2],[i+3,j+3],[i+4,j+4]]);
+			player[row_player].five_row.push(list)
+			// player[row_player].five_row.push([[i+k, j+k] for k in range(rings)]);
 			
 		}
 	}
@@ -526,7 +435,7 @@ function HighlightRow(){
 	guide_ctx.clearRect(0, 0, guide_canvas.width, guide_canvas.height);
 	if(player[current_player].five_row.length!=0){
 		for(var i=0;i<player[current_player].five_row.length;i++){
-			for(var j=0;j<5;j++){
+			for(var j=0;j<rings;j++){
 				var xindex=player[current_player].five_row[i][j][0];
 				var yindex=player[current_player].five_row[i][j][1];
 
@@ -576,7 +485,7 @@ function RemoveRow(xcoord,ycoord){
 	var row_count=0;
 	var select_row=-1;
 	for(var i=0;i<player[current_player].five_row.length;i++){
-		for(var j=0;j<5;j++){
+		for(var j=0;j<rings;j++){
 			if(player[current_player].five_row[i][j][0]==xcoord&&player[current_player].five_row[i][j][1]==ycoord){
 				row_count++;
 				select_row=i;
@@ -584,7 +493,7 @@ function RemoveRow(xcoord,ycoord){
 		}
 	}
 	if(row_count==1){
-		for(var k=0;k<5;k++){
+		for(var k=0;k<rings;k++){
 			var xclear=player[current_player].five_row[select_row][k][0];
 			var yclear=player[current_player].five_row[select_row][k][1];
 			piece_ctx.clearRect(positions[xclear][yclear].x-altitude/1.9, positions[xclear][yclear].y-altitude/1.9
@@ -595,7 +504,7 @@ function RemoveRow(xcoord,ycoord){
 				if(i==select_row){
 					continue;
 				}
-				for(var j=0;j<5;j++){
+				for(var j=0;j<rings;j++){
 					if(player[current_player].five_row[i][j][0]==player[current_player].five_row[select_row][k][0]
 						&&player[current_player].five_row[i][j][1]==player[current_player].five_row[select_row][k][1]){
 							player[current_player].five_row.splice(i,1);
@@ -626,8 +535,8 @@ function RemoveRing(xcoord,ycoord){
 		piece_ctx.clearRect(positions[xcoord][ycoord].x-altitude/1.9, positions[xcoord][ycoord].y-altitude/1.9, altitude*1.1, altitude*1.1);
 		piece_ctx.beginPath();
 		piece_ctx.strokeStyle=player[current_player].color;
-		piece_ctx.lineWidth=1;
-		piece_ctx.arc(Math.pow(-1,current_player)*player[current_player].rings_won*(altitude)+(piece_canvas.width/2),altitude/2,altitude/2,0,Math.PI*2);
+		piece_ctx.lineWidth=5;
+		piece_ctx.arc(Math.pow(-1,current_player)*player[current_player].rings_won*(altitude)+(piece_canvas.width/2),altitude/2,altitude/2.4,0,Math.PI*2);
 		piece_ctx.stroke();
 		piece_ctx.lineWidth=1;
 
@@ -656,8 +565,8 @@ function RemoveRing(xcoord,ycoord){
 }
 
 function IsClickValid(mouse){
-	for(var i=0;i<11;i++){
-		for(var j=0;j<11;j++){
+	for(var i=0;i<rows;i++){
+		for(var j=0;j<rows;j++){
 			if(positions[i][j].x==-1){
 				continue;
 			}
@@ -683,12 +592,14 @@ function IsClickValid(mouse){
 			}
 		}
 	}
-	//ActualColor();
 }
 
 function getCanvasMousePosition (event) {
   var rect = piece_canvas.getBoundingClientRect();
-
+  console.log(rect.left)
+  console.log(rect.top)
+  console.log(event.clientX)
+  console.log(event.clientY)
   return {
     x: event.clientX - rect.left,
     y: event.clientY - rect.top
@@ -699,6 +610,8 @@ document.addEventListener('click', function(event) {
         lastDownTarget = event.target;
         if(lastDownTarget == piece_canvas||lastDownTarget == guide_canvas||lastDownTarget == game_canvas) {
         	var canvasMousePosition = getCanvasMousePosition(event);
+    		console.log(canvasMousePosition.x)
+			console.log(canvasMousePosition.y)
         	IsClickValid(canvasMousePosition);
             /*game_ctx.beginPath();
 			game_ctx.arc(canvasMousePosition.x,canvasMousePosition.y,10,0,Math.PI*2);
