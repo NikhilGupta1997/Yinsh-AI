@@ -483,18 +483,49 @@ function MoveRings(xcoord,ycoord){
 	}
 }
 
-function RemoveRow(xcoord,ycoord,state=4){
+function matchPoints(px1, py1, px2, py2){
+    if(px1 == px2 && py1 == py2){
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function RemoveRow(startX,startY,endX,endY,state=4){
+    if(startX == null || startY == null){
+        return false;
+    }
+    console.log('StartX '+startX+' StartY '+startY+' EndX '+endX+' EndY '+endY);
+
 	var row_count=0;
 	var select_row=-1;
 	for(var i=0;i<player[current_player].five_row.length;i++){
-		for(var j=0;j<rings;j++){
-			if(player[current_player].five_row[i][j][0]==xcoord&&player[current_player].five_row[i][j][1]==ycoord){
-				row_count++;
-				select_row=i;
-			}
-		}
+        firstPointX = player[current_player].five_row[i][0][0];
+        firstPointY = player[current_player].five_row[i][0][1];
+        lastPointX = player[current_player].five_row[i][rings-1][0];
+        lastPointY = player[current_player].five_row[i][rings-1][1];
+          
+        if((matchPoints(startX, startY, firstPointX, firstPointY) && matchPoints(endX, endY, lastPointX,
+                    lastPointY)) || (matchPoints(startX, startY, lastPointX, lastPointY) &&
+                        matchPoints(endX, endY, firstPointX, firstPointY))) {
+            select_row = i;
+            row_count += 1;
+         
+        }
+
+		//for(var j=0;j<rings;j++){
+			//if(player[current_player].five_row[i][j][0]==xcoord&&player[current_player].five_row[i][j][1]==ycoord){
+				//row_count++;
+				//select_row=i;
+			//}
+		//}
 	}
+
+	console.log('Row Count '+row_count);
 	if(row_count==1){
+        var removeList = new Array();
+        removeList.push(select_row);
+
 		for(var k=0;k<rings;k++){
 			var xclear=player[current_player].five_row[select_row][k][0];
 			var yclear=player[current_player].five_row[select_row][k][1];
@@ -509,15 +540,19 @@ function RemoveRow(xcoord,ycoord,state=4){
 				for(var j=0;j<rings;j++){
 					if(player[current_player].five_row[i][j][0]==player[current_player].five_row[select_row][k][0]
 						&&player[current_player].five_row[i][j][1]==player[current_player].five_row[select_row][k][1]){
-							player[current_player].five_row.splice(i,1);
+                            removeList.push(i);
+							//player[current_player].five_row.splice(i,1);
 					}
 				}
 			}
-
-
 		}
 
-		player[current_player].five_row.splice(select_row,1);
+        var sortRemList = removeList.sort(); // sorts in ascending order
+        console.log(sortRemList);
+        for(i=removeList.length; i>=0; i--){
+            player[current_player].five_row.splice(sortRemList[i], 1)
+        }
+		//player[current_player].five_row.splice(select_row,1);
 		required_move=state;
 
 		HighlightRow();
@@ -525,8 +560,6 @@ function RemoveRow(xcoord,ycoord,state=4){
 	} else {
         return false
     }
-
-
 }
 
 function RemoveRing(xcoord,ycoord,state=4){
@@ -568,6 +601,8 @@ function RemoveRing(xcoord,ycoord,state=4){
     }
 }
 
+var startX = null;
+var startY = null;
 function IsClickValid(mouse){
 	for(var i=0;i<rows;i++){
 		for(var j=0;j<rows;j++){
@@ -586,9 +621,19 @@ function IsClickValid(mouse){
 					else if(required_move==2){
 						valid = MoveRings(i,j);
 					}
-					else if(required_move==3){
-						valid = RemoveRow(i,j);
-					}
+                    else if(required_move==3){
+                        startX = i;
+                        startY = j;
+                        required_move = 3.5;
+                    }
+                    else if(required_move==3.5){
+                        valid = RemoveRow(startX, startY, i,j);
+                        startX = null;
+                        startY = null;
+                    }
+					//else if(required_move==3){
+						//valid = RemoveRow(i,j);
+					//}
 					else if(required_move==4){
 						valid = RemoveRing(i,j);
 					}
