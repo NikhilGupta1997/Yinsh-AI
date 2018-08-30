@@ -38,8 +38,16 @@ class RandomPlayer:
 			position+=1
 		return '{type} {hex} {pos}'.format(type=movetype, hex=hexagon, pos=position), hexagon, position
 
-	def removeRow(self):
-		movetype = 'R'
+	def removeRowStart(self):
+		movetype = 'RS'
+		hexagon = random.randint(0,self.n)
+		position = random.randint(0,max(0,6*hexagon-1))
+		if hexagon==self.n and position%self.n==0:
+			position+=1
+		return '{type} {hex} {pos}'.format(type=movetype, hex=hexagon, pos=position)
+
+	def removeRowEnd(self):
+		movetype = 'RE'
 		hexagon = random.randint(0,self.n)
 		position = random.randint(0,max(0,6*hexagon-1))
 		if hexagon==self.n and position%self.n==0:
@@ -89,21 +97,29 @@ class RandomPlayer:
 				elif state == 2:
 					raise AssertionError("The player state cannot be 2 after a sequence of valid moves")
 				elif state == 3 or state == 6: ## Select Row to Remove (State 6 if other players your row)
-					move = self.removeRow()
-					success1 = self.game.execute_move(move); success2 = 0
-					if success1 == 0: ## Repeat Selection in case of more than one row
-						success2 = self.game.execute_move(move)
-					if success1 != 0 or success2 != 0:
+					move_start = self.removeRowStart()
+					# sys.stderr.write("move_start " + move_start + '\n')
+					# state = self.game.check_player_state()
+					# sys.stderr.write("state " + str(state) + '\n')
+					success = self.game.execute_move(move_start)
+					if success != 0:
+						while True:
+							move_end = self.removeRowEnd()
+							# sys.stderr.write("move_end " + move_end)
+							# state = self.game.check_player_state()
+							# sys.stderr.write("state " + str(state) + '\n')
+							success = self.game.execute_move(move_end)
+							if success != 0:
+								break
 						state = self.game.check_player_state()
-						if success1 != 0:
-							move_seq.append(move);
-						else:
-							move_seq.append(move); move_seq.append(move);
+						move_seq.append(move_start); move_seq.append(move_end);
+						# sys.stderr.write("Appended \n")
 				elif state == 4 or state == 7: ## Select Ring to Remove (State 7 if other players your row)
 					move, i = self.removeRing()
 					del self.RingPos[i]
 					self.game.execute_move(move)
 					move_seq.append(move)
+					# sys.stderr.write("Ring moved \n")
 					if state == 7:
 						continue
 					state = self.game.check_player_state()

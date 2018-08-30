@@ -491,11 +491,10 @@ function matchPoints(px1, py1, px2, py2){
     }
 }
 
-function RemoveRow(startX,startY,endX,endY,state=4){
-    if(startX == null || startY == null){
+function RemoveRow(x, y, state=4){
+    if(x == null || y == null){
         return false;
     }
-    console.log('StartX '+startX+' StartY '+startY+' EndX '+endX+' EndY '+endY);
 
 	var row_count=0;
 	var select_row=-1;
@@ -504,7 +503,33 @@ function RemoveRow(startX,startY,endX,endY,state=4){
         firstPointY = player[current_player].five_row[i][0][1];
         lastPointX = player[current_player].five_row[i][rings-1][0];
         lastPointY = player[current_player].five_row[i][rings-1][1];
-          
+        
+        if(matchPoints(x, y, firstPointX, firstPointY) || matchPoints(x, y, lastPointX, lastPointY)) {
+            if(state == 4) {
+	            required_move=3.5;
+	        }
+	       	else{
+	       		required_move=6.5;
+	       	}
+            return true;
+        }
+	}
+	return false;
+}
+
+function RemoveRowEnd(startX, startY, endX, endY, state=4){
+    if(startX == null || startY == null){
+        return false;
+    }
+
+	var row_count=0;
+	var select_row=-1;
+	for(var i=0;i<player[current_player].five_row.length;i++){
+        firstPointX = player[current_player].five_row[i][0][0];
+        firstPointY = player[current_player].five_row[i][0][1];
+        lastPointX = player[current_player].five_row[i][rings-1][0];
+        lastPointY = player[current_player].five_row[i][rings-1][1];
+        
         if((matchPoints(startX, startY, firstPointX, firstPointY) && matchPoints(endX, endY, lastPointX,
                     lastPointY)) || (matchPoints(startX, startY, lastPointX, lastPointY) &&
                         matchPoints(endX, endY, firstPointX, firstPointY))) {
@@ -512,13 +537,6 @@ function RemoveRow(startX,startY,endX,endY,state=4){
             row_count += 1;
          
         }
-
-		//for(var j=0;j<rings;j++){
-			//if(player[current_player].five_row[i][j][0]==xcoord&&player[current_player].five_row[i][j][1]==ycoord){
-				//row_count++;
-				//select_row=i;
-			//}
-		//}
 	}
 
 	console.log('Row Count '+row_count);
@@ -622,24 +640,24 @@ function IsClickValid(mouse){
 						valid = MoveRings(i,j);
 					}
                     else if(required_move==3){
-                        startX = i;
-                        startY = j;
-                        required_move = 3.5;
+                    	valid = RemoveRow(i,j);
+                    	startX = i;
+                    	startY = j;
                     }
                     else if(required_move==3.5){
-                        valid = RemoveRow(startX, startY, i,j);
-                        startX = null;
-                        startY = null;
+                        valid = RemoveRowEnd(startX, startY, i,j);
                     }
-					//else if(required_move==3){
-						//valid = RemoveRow(i,j);
-					//}
 					else if(required_move==4){
 						valid = RemoveRing(i,j);
 					}
 					else if(required_move==6){ // Other player first removes row and then plays move
 						valid = RemoveRow(i,j,7);
+						startX = i;
+                    	startY = j;
 					}
+					else if(required_move==6.5){
+						valid = RemoveRowEnd(startX, startY, i,j, 7);
+                    }
 					else if(required_move==7){ // Other player first removes ring and then plays move
 						valid = RemoveRing(i,j,7);
 					}

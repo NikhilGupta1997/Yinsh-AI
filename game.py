@@ -155,6 +155,7 @@ class Game:
     def execute_sequence(self, moves):
         success = 1
         move_list = []
+        player_id = self.check_player_state()
         for i, move in enumerate(moves):
             if i % 3 == 2:
                 move_list += [move]
@@ -162,6 +163,8 @@ class Game:
                 move_list = []
             else:
                 move_list += [move]
+        player = self.check_player_state()
+        # success = success and player_id != player
         return success
 
     '''
@@ -193,8 +196,6 @@ class Game:
             self.click_at(hexagon, position)
         elif (move_type == 'M'): # Move a ring
             self.click_at(hexagon, position)
-        # elif (move_type == 'R'): # Remove a row
-            # self.click_at(hexagon, position)
         elif (move_type == 'RS'): # Remove a row start
             self.click_at(hexagon, position)
         elif (move_type == 'RE'): # Remove a row end
@@ -216,57 +217,6 @@ class Game:
 
 if __name__ == "__main__":
     game = Game(5, 'GUI')
-    # game.execute_move("P 1 3")
-    # game.execute_move("P 0 0")
-    # game.execute_move("P 4 17")
-    # game.execute_move("P 4 8")
-    # game.execute_move("P 2 2")
-    # game.execute_move("P 2 8")
-    # game.execute_move("P 2 10")
-    # game.execute_move("P 5 19")
-    # game.execute_move("P 3 6")
-    # game.execute_move("P 2 7")
-    # game.execute_move("S 4 17 M 1 0")
-    # game.execute_move("S 2 8 M 3 12")
-    # game.execute_move("S 1 0 M 1 1")
-    # game.execute_move("S 0 0 M 2 0")
-    # game.execute_move("S 1 3 M 2 9")
-    # game.execute_move("S 4 8 M 5 11")
-    # game.execute_move("S 3 6 M 1 5")
-    # game.execute_move("S 2 7 M 5 16")
-    # game.execute_move("S 2 10 M 4 20")
-    # game.execute_move("S 2 0 M 2 11")
-    # game.execute_move("S 4 20 M 5 26")
-    # game.execute_move("S 2 11 M 3 14")
-    # game.execute_move("S 1 5 M 2 1")
-    # game.execute_move("S 3 12 M 5 13")
-    # game.execute_move("S 2 1 M 3 17")
-    # game.execute_move("S 5 19 M 4 15")
-    # game.execute_move("S 2 2 M 4 10")
-    # game.execute_move("S 3 14 M 3 1")
-    # game.execute_move("S 2 9 M 2 5")
-    # game.execute_move("S 5 11 M 4 9")
-    # game.execute_move("S 3 17 M 3 15")
-    # game.execute_move("S 3 1 M 4 23")
-    # game.execute_move("S 1 1 M 3 16")
-    # game.execute_move("S 5 16 M 1 4")
-    # game.execute_move("S 3 15 M 3 13 R 0 0 X 3 13")
-    # game.execute_move("S 1 4 M 3 10")
-    # game.execute_move("S 3 16 M 4 19")
-    # game.execute_move("S 4 23 M 4 20")
-    # game.execute_move("S 4 19 M 3 0")
-    # game.execute_move("S 4 20 M 0 0")
-    # game.execute_move("S 2 5 M 3 7")
-    # game.execute_move("S 4 15 M 3 13")
-    # game.execute_move("S 3 7 M 2 3")
-    # game.execute_move("S 3 13 M 5 18")
-    # game.execute_move("S 2 3 M 5 6")
-    # game.execute_move("S 3 10 M 2 4")
-    # game.execute_move("S 5 6 M 1 2")
-    # game.execute_move("S 0 0 M 1 5")
-    # game.execute_move("S 5 26 M 5 28")
-    # print game.get_score(1)
-    # print game.get_score(2)
     ### Enter Game Moves Here to Test
     ## Example: game.execute_move("P 2 0")
     
