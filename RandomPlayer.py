@@ -6,11 +6,11 @@ import time
 class RandomPlayer:
 
 	def __init__(self):
-		data = sys.stdin.readline().strip().split()
+		data = sys.stdin.readline().strip().split() # Initialize Environment
 		self.player = int(data[0]) - 1 # player can have values 0 and 1
 		self.n = int(data[1]) # n can have values 5, 6, or 7
 		self.time_left = int(data[2])
-		self.game = Game(self.n, 'GUI')
+		self.game = Game(self.n)
 		self.RingPos = {}
 		self.play()
 
@@ -56,7 +56,6 @@ class RandomPlayer:
 
 	def play_move_seq(self, move_seq):
 		moves = ' '.join(move_seq) + '\n'
-		sys.stderr.write('Chosen move seq: ' + moves)	
 		sys.stdout.write(moves)
 		sys.stdout.flush()
 
@@ -80,49 +79,39 @@ class RandomPlayer:
 					moveM, hex, pos = self.moveRing()
 					self.game.execute_move(moveS)
 					state = self.game.check_player_state()
-					sys.stderr.write('stateS is ' + str(state) + '\n')
 					success = self.game.execute_move(moveM)
-					sys.stderr.write('success1 is ' + str(success) + '\t' + moveS + '\t' + moveM + '\n')
 					if success != 0:
 						self.RingPos[i] = (hex, pos)
 						state = self.game.check_player_state()
-						sys.stderr.write('stateM is ' + str(state) + '\n')
 						move_seq.append(moveS); move_seq.append(moveM)
 						if state != 3:
 							break
 				elif state == 2:
 					raise AssertionError("The player state cannot be 2 after a sequence of valid moves")
-				elif state == 3 or state == 6: ## Select Row to Remove
+				elif state == 3 or state == 6: ## Select Row to Remove (State 6 if other players your row)
 					move = self.removeRow()
 					success1 = self.game.execute_move(move); success2 = 0
 					if success1 == 0: ## Repeat Selection in case of more than one row
 						success2 = self.game.execute_move(move)
-						sys.stderr.write('success3 - 2 is ' + str(success) + '\n')
-					else:
-						sys.stderr.write('success3 - 1 is ' + str(success) + '\n')
 					if success1 != 0 or success2 != 0:
 						state = self.game.check_player_state()
-						sys.stderr.write('state36 is ' + str(state) + '\n')
 						if success1 != 0:
 							move_seq.append(move);
 						else:
 							move_seq.append(move); move_seq.append(move);
-				elif state == 4 or state == 7: ## Select Ring to Remove
+				elif state == 4 or state == 7: ## Select Ring to Remove (State 7 if other players your row)
 					move, i = self.removeRing()
 					del self.RingPos[i]
 					self.game.execute_move(move)
 					move_seq.append(move)
 					if state == 7:
-						sys.stderr.write('state7\n')
 						continue
 					state = self.game.check_player_state()
-					sys.stderr.write('state4 is ' + str(state) + '\n')
 					if state != 3:
 						break
 			self.play_move_seq(move_seq)
 			
 			## Execute Other Player Move Sequence
-			sys.stderr.write('Waiting for other player\n')
 			move = sys.stdin.readline().strip()
 			self.game.execute_move(move)
 

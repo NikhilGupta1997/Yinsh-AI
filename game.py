@@ -56,7 +56,6 @@ class Game:
         self.centery = int(self.display_size)/2
 
         self.timer = time # Useful to optimise bot strategy
-        self.debug = False # Debugging Tool
 
     def get_corner_coord(self, corner, hexagon) :
         x_mov = self.spacing * hexagon * math.sin(math.radians(corner * 60))
@@ -96,9 +95,6 @@ class Game:
         required_move = self.driver.execute_script('return required_move;')
         return required_move == 5
 
-    def debug_on(self):
-        self.debug = True
-
     def execute_sequence(self, moves):
         success = 1
         move_list = []
@@ -136,29 +132,14 @@ class Game:
 
         if (move_type == 'P'): # Place your ring
             self.click_at(hexagon, position)
-            if self.debug:
-                valid = self.check_move_validity(); sys.stderr.write('\nvalid-P = ' + str(valid))
-                state = self.check_player_state(); sys.stderr.write('\nstate-P = ' + str(state))
         elif (move_type == 'S'): # Select a ring
             self.click_at(hexagon, position)
-            if self.debug:
-                valid = self.check_move_validity(); sys.stderr.write('\nvalid-S = ' + str(valid))
-                state = self.check_player_state(); sys.stderr.write('\nstate-S = ' + str(state))
         elif (move_type == 'M'): # Move a ring
             self.click_at(hexagon, position)
-            if self.debug:
-                valid = self.check_move_validity(); sys.stderr.write('\nvalid-M = ' + str(valid))
-                state = self.check_player_state(); sys.stderr.write('\nstate-M = ' + str(state))
         elif (move_type == 'R'): # Remove a row
             self.click_at(hexagon, position)
-            if self.debug:
-                valid = self.check_move_validity(); sys.stderr.write('\nvalid-R = ' + str(valid))
-                state = self.check_player_state(); sys.stderr.write('\nstate-R = ' + str(state))
         elif (move_type == 'X'): # Remove a ring
             self.click_at(hexagon, position)
-            if self.debug:
-                valid = self.check_move_validity(); sys.stderr.write('\nvalid-X = ' + str(valid))
-                state = self.check_player_state(); sys.stderr.write('\nstate-X = ' + str(state))
         else:
             string_invalid = True 
     
@@ -174,68 +155,8 @@ class Game:
 
 if __name__ == "__main__":
     game = Game(5, "GUI")
-    game.execute_move("P 0 0")
-    game.execute_move("P 5 11")
-    game.execute_move("P 3 13")
-    game.execute_move("P 5 4")
-    game.execute_move("P 3 2")
-    game.execute_move("P 1 5")
-    game.execute_move("P 4 11")
-    game.execute_move("P 2 1")
-    game.execute_move("P 4 21")
-    game.execute_move("P 2 11")
-    game.execute_move("S 3 13 M 2 6")
-    game.execute_move("S 5 11 M 1 3")
-    game.execute_move("S 4 21 M 5 26")
-    game.execute_move("S 2 11 M 2 10")
-    game.execute_move("S 4 11 M 4 17")
-    game.execute_move("S 2 10 M 3 11")
-    game.execute_move("S 4 17 M 5 22")
-    game.execute_move("S 1 5 M 2 7")
-    game.execute_move("S 5 26 M 5 29")
-    game.execute_move("S 3 11 M 2 9")
-    game.execute_move("S 0 0 M 4 4")
-    game.execute_move("S 2 9 M 3 16")
-    game.execute_move("S 4 4 M 4 2")
-    game.execute_move("S 2 7 M 3 10")
-    game.execute_move("S 3 2 M 4 23")
-    game.execute_move("S 3 16 M 1 0")
-    game.execute_move("S 5 29 M 4 1")
-    game.execute_move("S 3 10 M 1 4")
-    game.execute_move("S 2 6 M 3 5")
-    game.execute_move("S 1 3 M 2 3")
-    game.execute_move("S 4 1 M 3 1")
-    game.execute_move("S 2 3 M 1 2")
-    game.execute_move("S 3 1 M 5 1")
-    game.execute_move("S 1 4 M 3 14")
-    game.execute_move("S 4 23 M 3 3")
-    game.execute_move("S 2 1 M 2 0")
-    game.execute_move("S 3 5 M 5 12")
-    game.execute_move("S 1 2 M 1 1")
-    game.execute_move("S 5 12 M 4 9")
-    game.execute_move("S 5 4 M 4 5")
-    game.execute_move("S 4 2 M 2 2")
-    game.execute_move("S 3 14 M 4 19")
-    game.execute_move("S 5 22 M 5 21")
-    game.execute_move("S 4 5 M 4 15")
-    game.execute_move("S 3 3 M 3 0")
-    game.execute_move("S 2 0 M 4 22")
-    game.execute_move("S 4 9 M 2 5")
-    game.execute_move("S 4 15 M 3 12")
-    game.execute_move("S 5 1 M 4 0")
-    game.execute_move("S 4 19 M 4 16")
-    game.execute_move("S 5 21 M 5 23")
-    game.execute_move("S 4 16 M 4 14")
-    game.execute_move("S 3 0 M 5 2")
-    game.execute_move("S 4 22 M 5 28")
-    game.execute_move("S 2 5 M 2 4")
-    game.execute_move("S 4 14 M 4 13")
-    game.execute_move("S 5 23 M 2 8")
-    game.execute_move("S 5 28 M 5 27")
-    game.execute_move("S 2 2 M 3 4")
-    game.debug_on()
-    game.execute_move("S 4 13 M 3 9 R 1 4 X 3 9")
-    game.execute_move("S 3 4 M 5 6 R 1 3 X 4 0")
-    # game.execute_move("X 1 0")
+    ### Enter Game Moves Here to Test
+    ## Example: game.execute_move("P 2 0")
+    
 
 
