@@ -1,9 +1,9 @@
-from Communicator import Communicator
-import socket,sys,json,os,time,pdb
-import math
-from game import Game
-# from Board import Board
 import argparse
+import math
+import socket,sys,json,os,time,pdb
+
+from Communicator import Communicator
+from game import Game
 
 class Client(Communicator):
 	def __init__(self):
@@ -270,8 +270,14 @@ def game_loop(args):
 			message['action'] = 'FINISH'
 			message['data'] = move['data']
 			if success == 2:
-				message['meta'] = 'Player' +  player_id + 'wins WITH SCORE :'
+				message['meta'] = 'Player ' +  player_id + ' wins WITH SCORE : ' + str(game.get_score(player_id))
 				print 'YOU WIN!'
+				if player_id == '1':
+					print 'Your Score : ' + str(game.get_score(1))
+					print 'Opponent\'s Score : ' + str(game.get_score(2))
+				else:
+					print 'Your Score : ' + str(game.get_score(2))
+					print 'Opponent\'s Score : ' + str(game.get_score(1))
 
 		client.SendData2Server(message)
 		if message['action'] == 'FINISH' or message['action'] == 'KILLPROC':
@@ -281,11 +287,19 @@ def game_loop(args):
 		move = client.RecvDataFromServer()
 		if move:
 			move = move.strip()
-			print "The other player played " + move
+			if player_id == 1:
+				print "Player 2 played : " + move
+			else:
+				print "Player 1 played : " + move
 			success = game.execute_move(move)
 			if success == 2:
-				message['meta'] = 'Player' +  player_id + 'wins WITH SCORE :'                                            
 				print 'OTHER PLAYER WINS!'
+				if player_id == '1':
+					print 'Your Score : ' + str(game.get_score(1))
+					print 'Opponent\'s Score : ' + str(game.get_score(2))
+				else:
+					print 'Your Score : ' + str(game.get_score(2))
+					print 'Opponent\'s Score : ' + str(game.get_score(1))
 				break
 			else:                                   
 				client.SendData2Process(move)

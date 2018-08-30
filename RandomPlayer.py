@@ -1,6 +1,6 @@
-import sys
 from game import Game
 import random
+import sys
 import time
 
 class RandomPlayer:
