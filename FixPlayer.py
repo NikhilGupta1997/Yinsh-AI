@@ -10,7 +10,7 @@ class RandomPlayer:
 		self.player = int(data[0]) - 1 # player can have values 0 and 1
 		self.n = int(data[1]) # n can have values 5, 6, or 7
 		self.time_left = int(data[2])
-		self.game = Game(self.n)
+		self.game = Game(self.n, 'GUI')
 		self.RingPos = {}
 		self.play()
 
@@ -22,108 +22,107 @@ class RandomPlayer:
 			position+=1
 		return '{type} {hex} {pos}'.format(type=movetype, hex=hexagon, pos=position), len(self.RingPos), hexagon, position
 
-	def moveRing(self):
-		movetype = 'M'
+	def selectRing(self):
+		movetype = 'S'
 		ring_num = random.randint(0,self.n-1)
 		while ring_num not in self.RingPos:
 			ring_num = random.randint(0,self.n-1)
 		ring = self.RingPos[ring_num]
+		return '{type} {hex} {pos}'.format(type=movetype, hex=ring[0], pos=ring[1]), ring_num
+
+	def moveRing(self):
+		movetype = 'M'
 		hexagon = random.randint(0,self.n)
 		position = random.randint(0,max(0,6*hexagon-1))
 		if hexagon==self.n and position%self.n==0:
 			position+=1
-		return '{type} {hexold} {posold} {hex} {pos}'.format(type=movetype, hexold=ring[0], posold=ring[1], hex=hexagon, pos=position), ring_num, hexagon, position
+		return '{type} {hex} {pos}'.format(type=movetype, hex=hexagon, pos=position), hexagon, position
 
-	def removeRing(self):
+	def removeRow(self):
 		movetype = 'R'
 		hexagon = random.randint(0,self.n)
 		position = random.randint(0,max(0,6*hexagon-1))
+		if hexagon==self.n and position%self.n==0:
+			position+=1
+		return '{type} {hex} {pos}'.format(type=movetype, hex=hexagon, pos=position)
+
+	def removeRing(self):
+		movetype = 'X'
 		ring_num = random.randint(0,self.n-1)
 		while ring_num not in self.RingPos:
 			ring_num = random.randint(0,self.n-1)
 		ring = self.RingPos[ring_num]
-		return '{type} {hex} {pos} {hexold} {posold}'.format(type=movetype, hex=hexagon, pos=position, hexold=ring[0], posold=ring[1]), ring_num
+		return '{type} {hex} {pos}'.format(type=movetype, hex=ring[0], pos=ring[1]), ring_num
+
+	def play_move_seq(self, move_seq):
+		moves = ' '.join(move_seq) + '\n'
+		sys.stderr.write('Chosen move seq: ' + moves)	
+		sys.stdout.write(moves)
+		sys.stdout.flush()
 
 	def play(self):
 		if self.player == 1:
-			# while self.game.get_current_player()==0:
 			move = sys.stdin.readline().strip()
 			self.game.execute_move(move)
-		while True:
-			while True:
+		while True: # Keep playing moves till game is over
+			move_seq = []
+			while True: # Loop till valid move sequence is found
 				state = self.game.check_player_state()
-				if state == 0:
-					move, i, hex, pos = self.placeRing()
-					success = self.game.execute_move(move)
+				if state == 0: ## Place Rings
+					moveP, i, hex, pos = self.placeRing()
+					success = self.game.execute_move(moveP)
 					if success != 0:
-						# time.sleep(1)
 						self.RingPos[i] = (hex, pos)
-						move = move + '\n'
-						sys.stderr.write('Chosen move: ' + move)	
-						sys.stdout.write(move)
-						sys.stdout.flush()
+						move_seq.append(moveP)
 						break
-				elif state == 1 or state == 2:
-					move, i, hex, pos = self.moveRing()
-					success = self.game.execute_move(move)
-					sys.stderr.write('success1/2 is ' + str(success) + '\n')
+				elif state == 1: ## Select a Ring and the Move to Valid Postion
+					moveS, i = self.selectRing()
+					moveM, hex, pos = self.moveRing()
+					self.game.execute_move(moveS)
+					state = self.game.check_player_state()
+					sys.stderr.write('stateS is ' + str(state) + '\n')
+					success = self.game.execute_move(moveM)
+					sys.stderr.write('success1 is ' + str(success) + '\t' + moveS + '\t' + moveM + '\n')
 					if success != 0:
 						self.RingPos[i] = (hex, pos)
 						state = self.game.check_player_state()
-						sys.stderr.write('state is ' + str(state) + '\n')
-						while state == 3 and self.game.get_current_player()==self.player:
-							sec_move, i = self.removeRing()
-							success = self.game.execute_move(sec_move)
-							sys.stderr.write('success3 is ' + str(success) + '\n')
-							if success != 0:
-								del self.RingPos[i]
-								state = self.game.check_player_state()
-								sys.stderr.write('state is ' + str(state) + '\n')
-								if state == 3 and self.game.get_current_player()==self.player:
-									move = move + ' ' + sec_move
-									continue
-								sec_move = sec_move + '\n'
-								sys.stderr.write('Chosen move: ' + sec_move)	
-								sys.stdout.write(move + ' ' + sec_move)
-								sys.stdout.flush()
-								sys.stderr.write('Ring Removed!\n')
-								sys.stderr.write('player is' + str(self.game.get_current_player()) + '\n')
-								break
-						else:
-							move = move + '\n'
-							sys.stderr.write('Chosen move: ' + move)	
-							sys.stdout.write(move)
-							sys.stdout.flush()
-						break
-				else:
-					move = None
-					while state == 3:
-						sec_move, i = self.removeRing()
-						success = self.game.execute_move(sec_move)
-						sys.stderr.write('success3* is ' + str(success) + '\n')
-						if success != 0:
-							del self.RingPos[i]
-							state = self.game.check_player_state()
-							sys.stderr.write('state is ' + str(state) + '\n')
-							if state == 3 and self.game.get_current_player()==self.player:
-								if move:
-									move = move + ' ' + sec_move
-								else:
-									move = sec_move
-								continue
-							sec_move = sec_move + '\n'
-							sys.stderr.write('Chosen move: ' + sec_move)	
-							if move:
-								sys.stdout.write(move + ' ' + sec_move)
-							else:
-								sys.stdout.write(sec_move)
-							sys.stdout.flush()
-							sys.stderr.write('Ring Removed!\n')
-							sys.stderr.write('player is' + str(self.game.get_current_player()) + '\n')
+						sys.stderr.write('stateM is ' + str(state) + '\n')
+						move_seq.append(moveS); move_seq.append(moveM)
+						if state != 3:
 							break
-
-			sys.stderr.write('waiting for other player\n')
-			# while self.game.get_current_player()!=self.player:
+				elif state == 2:
+					raise AssertionError("The player state cannot be 2 after a sequence of valid moves")
+				elif state == 3 or state == 6: ## Select Row to Remove
+					move = self.removeRow()
+					success1 = self.game.execute_move(move); success2 = 0
+					if success1 == 0: ## Repeat Selection in case of more than one row
+						success2 = self.game.execute_move(move)
+						sys.stderr.write('success3 - 2 is ' + str(success) + '\n')
+					else:
+						sys.stderr.write('success3 - 1 is ' + str(success) + '\n')
+					if success1 != 0 or success2 != 0:
+						state = self.game.check_player_state()
+						sys.stderr.write('state36 is ' + str(state) + '\n')
+						if success1 != 0:
+							move_seq.append(move);
+						else:
+							move_seq.append(move); move_seq.append(move);
+				elif state == 4 or state == 7: ## Select Ring to Remove
+					move, i = self.removeRing()
+					del self.RingPos[i]
+					self.game.execute_move(move)
+					move_seq.append(move)
+					if state == 7:
+						sys.stderr.write('state7\n')
+						continue
+					state = self.game.check_player_state()
+					sys.stderr.write('state4 is ' + str(state) + '\n')
+					if state != 3:
+						break
+			self.play_move_seq(move_seq)
+			
+			## Execute Other Player Move Sequence
+			sys.stderr.write('Waiting for other player\n')
 			move = sys.stdin.readline().strip()
 			self.game.execute_move(move)
 

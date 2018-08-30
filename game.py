@@ -1,12 +1,12 @@
 import math
 import numpy as np
 import os
+import sys
 import time
 
 from jinja2 import Environment, FileSystemLoader
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-
 
 board_sizes = { 5 : 11, 6 : 13, 7 : 15 } # Rings : Board Size
 display_size = { 5 : 650, 6 : 750, 7 : 850 } # Rings : Pixels
@@ -56,6 +56,7 @@ class Game:
         self.centery = int(self.display_size)/2
 
         self.timer = time # Useful to optimise bot strategy
+        self.debug = False # Debugging Tool
 
     def get_corner_coord(self, corner, hexagon) :
         x_mov = self.spacing * hexagon * math.sin(math.radians(corner * 60))
@@ -95,11 +96,14 @@ class Game:
         required_move = self.driver.execute_script('return required_move;')
         return required_move == 5
 
+    def debug_on(self):
+        self.debug = True
+
     def execute_sequence(self, moves):
         success = 1
         move_list = []
         for i, move in enumerate(moves):
-            if i % 5 == 4:
+            if i % 3 == 2:
                 move_list += [move]
                 success = success and self.execute_move(' '.join(move_list))
                 move_list = []
@@ -107,35 +111,55 @@ class Game:
                 move_list += [move]
         return success
 
+    '''
     ## New suggested move types
     # P - Place a ring
+    # S - Select a ring
     # M - Move a ring
-    # R - Remove a ring
+    # R - Remove a row
+    # X - Remove a ring
+
+    ## Grid Positions
     # point in center is hexagon 0 and so on outwards
     # topmost point of hexagon is point 0 and pt number increase clockwise with 6*hexring pts on each hexagon
+    '''
     def execute_move(self, cmd) :
         moves = cmd.split()
-        if len(moves) > 5:
+        if len(moves) > 3:
             return self.execute_sequence(moves)
         move_type = moves[0]
-        moves = [int(m) for m in moves[1:]]
+        hexagon = int(moves[1])
+        position = int(moves[2])
 
         success = 1
         string_invalid = False
-        if (move_type == 'P') :
-            # place your ring
-            self.click_at(moves[0], moves[1])
-        elif (move_type == 'M') :
-            # choose a ring
-            self.click_at(moves[0], moves[1])
-            # move the ring to a valid location
-            self.click_at(moves[2], moves[3])
-        elif (move_type == 'R') :
-            # remove five continuous markers
-            self.click_at(moves[0], moves[1])
-            # remove a ring
-            self.click_at(moves[2], moves[3])
-        else :
+
+        if (move_type == 'P'): # Place your ring
+            self.click_at(hexagon, position)
+            if self.debug:
+                valid = self.check_move_validity(); sys.stderr.write('\nvalid-P = ' + str(valid))
+                state = self.check_player_state(); sys.stderr.write('\nstate-P = ' + str(state))
+        elif (move_type == 'S'): # Select a ring
+            self.click_at(hexagon, position)
+            if self.debug:
+                valid = self.check_move_validity(); sys.stderr.write('\nvalid-S = ' + str(valid))
+                state = self.check_player_state(); sys.stderr.write('\nstate-S = ' + str(state))
+        elif (move_type == 'M'): # Move a ring
+            self.click_at(hexagon, position)
+            if self.debug:
+                valid = self.check_move_validity(); sys.stderr.write('\nvalid-M = ' + str(valid))
+                state = self.check_player_state(); sys.stderr.write('\nstate-M = ' + str(state))
+        elif (move_type == 'R'): # Remove a row
+            self.click_at(hexagon, position)
+            if self.debug:
+                valid = self.check_move_validity(); sys.stderr.write('\nvalid-R = ' + str(valid))
+                state = self.check_player_state(); sys.stderr.write('\nstate-R = ' + str(state))
+        elif (move_type == 'X'): # Remove a ring
+            self.click_at(hexagon, position)
+            if self.debug:
+                valid = self.check_move_validity(); sys.stderr.write('\nvalid-X = ' + str(valid))
+                state = self.check_player_state(); sys.stderr.write('\nstate-X = ' + str(state))
+        else:
             string_invalid = True 
     
         valid = self.check_move_validity()
@@ -150,45 +174,68 @@ class Game:
 
 if __name__ == "__main__":
     game = Game(5, "GUI")
-    game.execute_move("P 2 0")
-    game.execute_move("P 5 16")
     game.execute_move("P 0 0")
-    game.execute_move("P 5 14")
-    game.execute_move("P 2 9")
-    game.execute_move("P 1 3")
-    game.execute_move("P 1 0")
-    game.execute_move("P 3 0")
-    game.execute_move("P 3 6")
-    game.execute_move("P 4 4")
-    game.execute_move("M 2 9 5 28")
-    game.execute_move("M 1 3 3 14")
-    game.execute_move("M 5 28 5 26")
-    game.execute_move("M 3 0 3 17")
-    game.execute_move("M 0 0 1 2")
-    game.execute_move("M 4 4 2 2")
-    game.execute_move("M 1 2 3 1")
-    game.execute_move("M 5 16 1 4")
-    game.execute_move("M 3 1 1 1")
-    game.execute_move("M 2 2 4 6")
-    game.execute_move("M 1 0 4 3")
-    game.execute_move("M 3 14 5 24")
-    game.execute_move("M 3 6 3 9")
-    game.execute_move("M 4 6 3 4")
-    game.execute_move("M 4 3 3 3")
-    game.execute_move("M 1 4 2 8")
-    game.execute_move("M 5 26 5 27")
-    game.execute_move("M 3 17 1 5")
-    game.execute_move("M 2 0 2 6")
-    game.execute_move("M 3 4 2 7")
-    game.execute_move("M 1 1 2 3")
-    game.execute_move("M 5 14 4 16")
-    game.execute_move("M 2 6 3 5")
-    game.execute_move("M 4 16 4 18")
-    game.execute_move("M 5 27 5 29")
-    game.execute_move("M 4 18 2 10")
-    game.execute_move("M 3 9 4 11")
-    game.execute_move("M 2 8 3 11")
-    # game.execute_move("M 4 11 2 1")
-    # game.execute_move("R 0 0 2 10")
-    # game.execute_move("M 3 3 0 0")
+    game.execute_move("P 5 11")
+    game.execute_move("P 3 13")
+    game.execute_move("P 5 4")
+    game.execute_move("P 3 2")
+    game.execute_move("P 1 5")
+    game.execute_move("P 4 11")
+    game.execute_move("P 2 1")
+    game.execute_move("P 4 21")
+    game.execute_move("P 2 11")
+    game.execute_move("S 3 13 M 2 6")
+    game.execute_move("S 5 11 M 1 3")
+    game.execute_move("S 4 21 M 5 26")
+    game.execute_move("S 2 11 M 2 10")
+    game.execute_move("S 4 11 M 4 17")
+    game.execute_move("S 2 10 M 3 11")
+    game.execute_move("S 4 17 M 5 22")
+    game.execute_move("S 1 5 M 2 7")
+    game.execute_move("S 5 26 M 5 29")
+    game.execute_move("S 3 11 M 2 9")
+    game.execute_move("S 0 0 M 4 4")
+    game.execute_move("S 2 9 M 3 16")
+    game.execute_move("S 4 4 M 4 2")
+    game.execute_move("S 2 7 M 3 10")
+    game.execute_move("S 3 2 M 4 23")
+    game.execute_move("S 3 16 M 1 0")
+    game.execute_move("S 5 29 M 4 1")
+    game.execute_move("S 3 10 M 1 4")
+    game.execute_move("S 2 6 M 3 5")
+    game.execute_move("S 1 3 M 2 3")
+    game.execute_move("S 4 1 M 3 1")
+    game.execute_move("S 2 3 M 1 2")
+    game.execute_move("S 3 1 M 5 1")
+    game.execute_move("S 1 4 M 3 14")
+    game.execute_move("S 4 23 M 3 3")
+    game.execute_move("S 2 1 M 2 0")
+    game.execute_move("S 3 5 M 5 12")
+    game.execute_move("S 1 2 M 1 1")
+    game.execute_move("S 5 12 M 4 9")
+    game.execute_move("S 5 4 M 4 5")
+    game.execute_move("S 4 2 M 2 2")
+    game.execute_move("S 3 14 M 4 19")
+    game.execute_move("S 5 22 M 5 21")
+    game.execute_move("S 4 5 M 4 15")
+    game.execute_move("S 3 3 M 3 0")
+    game.execute_move("S 2 0 M 4 22")
+    game.execute_move("S 4 9 M 2 5")
+    game.execute_move("S 4 15 M 3 12")
+    game.execute_move("S 5 1 M 4 0")
+    game.execute_move("S 4 19 M 4 16")
+    game.execute_move("S 5 21 M 5 23")
+    game.execute_move("S 4 16 M 4 14")
+    game.execute_move("S 3 0 M 5 2")
+    game.execute_move("S 4 22 M 5 28")
+    game.execute_move("S 2 5 M 2 4")
+    game.execute_move("S 4 14 M 4 13")
+    game.execute_move("S 5 23 M 2 8")
+    game.execute_move("S 5 28 M 5 27")
+    game.execute_move("S 2 2 M 3 4")
+    game.debug_on()
+    game.execute_move("S 4 13 M 3 9 R 1 4 X 3 9")
+    game.execute_move("S 3 4 M 5 6 R 1 3 X 4 0")
+    # game.execute_move("X 1 0")
+
 

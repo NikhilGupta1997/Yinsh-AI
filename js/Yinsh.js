@@ -192,8 +192,6 @@ PlotPoints();
 DrawBoardLines();
 
 function PlaceRings(xcoord,ycoord){
-	console.log(xcoord)
-	console.log(ycoord)
 	if(positions[xcoord][ycoord].piece==0){
 		piece_ctx.beginPath();
 		piece_ctx.strokeStyle=player[current_player].color;
@@ -237,7 +235,6 @@ function BlackGuides(xcoord,ycoord,asign,bsign,guide){
 function SelectRings(xcoord,ycoord){
 	if(positions[xcoord][ycoord].piece==Math.pow(-1,current_player)*2){
 		console.log("SelectRings")
-		console.log(xcoord, ycoord)
 		guide_ctx.beginPath();
 		guide_ctx.strokeStyle="black";
 		guide_ctx.arc(positions[xcoord][ycoord].x,positions[xcoord][ycoord].y,altitude*3/10,0,Math.PI*2);
@@ -433,7 +430,7 @@ function CheckRows(){
 	
 }
 
-function HighlightRow(){
+function HighlightRow(state=3){
 	guide_ctx.clearRect(0, 0, guide_canvas.width, guide_canvas.height);
 	if(player[current_player].five_row.length!=0){
 		for(var i=0;i<player[current_player].five_row.length;i++){
@@ -449,7 +446,7 @@ function HighlightRow(){
 				guide_ctx.stroke();
 			}
 		}
-		required_move=3;
+		required_move=state;
 	}
 }
 
@@ -469,7 +466,7 @@ function MoveRings(xcoord,ycoord){
 		HighlightRow();
 		if(required_move!=3){
 			SwitchPlayer();
-			HighlightRow();
+			HighlightRow(6);
 		}
         return true
 	}
@@ -486,7 +483,7 @@ function MoveRings(xcoord,ycoord){
 	}
 }
 
-function RemoveRow(xcoord,ycoord){
+function RemoveRow(xcoord,ycoord,state=4){
 	var row_count=0;
 	var select_row=-1;
 	for(var i=0;i<player[current_player].five_row.length;i++){
@@ -521,7 +518,7 @@ function RemoveRow(xcoord,ycoord){
 		}
 
 		player[current_player].five_row.splice(select_row,1);
-		required_move=4;
+		required_move=state;
 
 		HighlightRow();
         return true
@@ -532,7 +529,7 @@ function RemoveRow(xcoord,ycoord){
 
 }
 
-function RemoveRing(xcoord,ycoord){
+function RemoveRing(xcoord,ycoord,state=4){
 	if(positions[xcoord][ycoord].piece==Math.pow(-1,current_player)*2){
 		player[current_player].rings_won++;
 		positions[xcoord][ycoord].board_rings--;
@@ -541,7 +538,7 @@ function RemoveRing(xcoord,ycoord){
 		piece_ctx.beginPath();
 		piece_ctx.strokeStyle=player[current_player].color;
 		piece_ctx.lineWidth=5;
-		piece_ctx.arc(Math.pow(-1,current_player)*player[current_player].rings_won*(altitude)+(piece_canvas.width/2),altitude/2,altitude/2.4,0,Math.PI*2);
+		piece_ctx.arc(Math.pow(-1,current_player)*(player[current_player].rings_won+2)*(altitude)+(piece_canvas.width/2),altitude/2,altitude/2.4,0,Math.PI*2);
 		piece_ctx.stroke();
 		piece_ctx.lineWidth=1;
 
@@ -550,7 +547,9 @@ function RemoveRing(xcoord,ycoord){
 			required_move=5;
 		}
 		else if(player[current_player].five_row.length==0){
-			SwitchPlayer();
+			if(state!=7){
+				SwitchPlayer();
+			}
 			if(player[current_player].five_row.length==0){
 				required_move=1;
 			}
@@ -582,11 +581,9 @@ function IsClickValid(mouse){
 						valid = PlaceRings(i,j);
 					}
 					else if(required_move==1){
-						console.log('SelectRings')
 						valid = SelectRings(i,j);
 					}
 					else if(required_move==2){
-						console.log('MoveRings')
 						valid = MoveRings(i,j);
 					}
 					else if(required_move==3){
@@ -594,6 +591,12 @@ function IsClickValid(mouse){
 					}
 					else if(required_move==4){
 						valid = RemoveRing(i,j);
+					}
+					else if(required_move==6){ // Other player first removes row and then plays move
+						valid = RemoveRow(i,j,7);
+					}
+					else if(required_move==7){ // Other player first removes ring and then plays move
+						valid = RemoveRing(i,j,7);
 					}
                     is_valid = valid
 			}
@@ -603,10 +606,6 @@ function IsClickValid(mouse){
 
 function getCanvasMousePosition (event) {
   var rect = piece_canvas.getBoundingClientRect();
-  // console.log(rect.left)
-  // console.log(rect.top)
-  // console.log(event.clientX)
-  // console.log(event.clientY)
   return {
     x: event.clientX - rect.left,
     y: event.clientY - rect.top
