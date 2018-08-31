@@ -77,22 +77,24 @@ The game score consists of two parts:
 
 ### The Ring Margin
 This score will be based on the extent of victory. It is calculated as follows:  
-`Your Rings Removed - Opponents Rings Removed : Ring Margin Score`
-> 3-0: 10  
-> 3-1: 9  
-> 3-2: 8  
-> 2-0: 7  
-> 2-1: 6  
-> 1-0: 6  
-> 2-2: 5  
-> 1-1: 5  
-> 0-0: 5  
-> 0-1: 4  
-> 1-2: 4  
-> 0-2: 3  
-> 2-3: 2  
-> 1-3: 1  
-> 0-3: 0  
+
+| Your Rings Removed | Opponents Rings Removed | Ring Margin Score |  
+| ------------- | ------------- | ------------- |
+| 3 | 0 | 10 |  
+| 3 | 1 | 9 |  
+| 3 | 2 | 8 |  
+| 2 | 0 | 7 |  
+| 2 | 1 | 6 |  
+| 1 | 0 | 6 |  
+| 2 | 2 | 5 |  
+| 1 | 1 | 5 |  
+| 0 | 0 | 5 |  
+| 0 | 1 | 4 |  
+| 1 | 2 | 4 |  
+| 0 | 2 | 3 |  
+| 2 | 3 | 2 |  
+| 1 | 3 | 1 |  
+| 0 | 3 | 0 |  
 
 ### The Marker Margin
 This score directly depends on the number of markers you have left at the end of the game. It is calculated as follows:  
