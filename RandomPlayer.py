@@ -98,28 +98,20 @@ class RandomPlayer:
 					raise AssertionError("The player state cannot be 2 after a sequence of valid moves")
 				elif state == 3 or state == 6: ## Select Row to Remove (State 6 if other players your row)
 					move_start = self.removeRowStart()
-					# sys.stderr.write("move_start " + move_start + '\n')
-					# state = self.game.check_player_state()
-					# sys.stderr.write("state " + str(state) + '\n')
 					success = self.game.execute_move(move_start)
 					if success != 0:
 						while True:
 							move_end = self.removeRowEnd()
-							# sys.stderr.write("move_end " + move_end)
-							# state = self.game.check_player_state()
-							# sys.stderr.write("state " + str(state) + '\n')
 							success = self.game.execute_move(move_end)
 							if success != 0:
 								break
 						state = self.game.check_player_state()
 						move_seq.append(move_start); move_seq.append(move_end);
-						# sys.stderr.write("Appended \n")
 				elif state == 4 or state == 7: ## Select Ring to Remove (State 7 if other players your row)
 					move, i = self.removeRing()
 					del self.RingPos[i]
 					self.game.execute_move(move)
 					move_seq.append(move)
-					# sys.stderr.write("Ring moved \n")
 					if state == 7:
 						continue
 					state = self.game.check_player_state()
