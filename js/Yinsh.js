@@ -492,7 +492,7 @@ function RemoveRow(x, y, state=4){
     if(x == null || y == null){
         return false;
     }
-
+    console.log('RemoveRow');
 	var row_count=0;
 	var select_row=-1;
 	for(var i=0;i<player[current_player].five_row.length;i++){
@@ -553,7 +553,7 @@ function RemoveRowEnd(startX, startY, endX, endY, state=4){
 				for(var j=0;j<rings;j++){
 					if(player[current_player].five_row[i][j][0]==player[current_player].five_row[select_row][k][0]
 						&&player[current_player].five_row[i][j][1]==player[current_player].five_row[select_row][k][1]){
-                            removeList.push(i);s
+                            removeList.push(i);
 					}
 				}
 			}
