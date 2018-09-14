@@ -492,7 +492,6 @@ function RemoveRow(x, y, state=4){
     if(x == null || y == null){
         return false;
     }
-    console.log('RemoveRow');
 	var row_count=0;
 	var select_row=-1;
 	for(var i=0;i<player[current_player].five_row.length;i++){
@@ -558,12 +557,9 @@ function RemoveRowEnd(startX, startY, endX, endY, state=4){
 				}
 			}
 		}
-
-        var sortRemList = removeList.sort(); // sorts in ascending order
-        for(i=removeList.length-1; i>=0; i--){     	
-            player[current_player].five_row.splice(sortRemList[i], 1)
-        }
-		required_move=state;;
+        player[current_player].five_row.length = 0
+		CheckRows();
+		required_move=state;
 		guide_ctx.clearRect(0, 0, guide_canvas.width, guide_canvas.height);
         return true
 	} else {
