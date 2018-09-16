@@ -517,7 +517,6 @@ function RemoveRowEnd(startX, startY, endX, endY, state=4){
     if(startX == null || startY == null){
         return false;
     }
-
 	var row_count=0;
 	var select_row=-1;
 	for(var i=0;i<player[current_player].five_row.length;i++){
@@ -534,7 +533,7 @@ function RemoveRowEnd(startX, startY, endX, endY, state=4){
          
         }
 	}
-	if(row_count==1){
+	if(row_count>=1){
         var removeList = new Array();
         removeList.push(select_row);
 
