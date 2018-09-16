@@ -220,7 +220,6 @@ class Game:
 			success = 0
 		elif(won == True):
 			success = 2
-		print success
 		return success
 
 if __name__ == "__main__":
