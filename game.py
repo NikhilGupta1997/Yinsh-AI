@@ -222,6 +222,15 @@ class Game:
 			success = 2
 		return success
 
+	def simulate(self, filename):
+		with open(filename) as f:
+			for line in f.readlines():
+				parts = line.split('}')
+				part = parts[0] + '}'
+				out = json.loads(part)
+				exec("self.execute_move(\"" + out['data'] + "\")")
+
 if __name__ == "__main__":
 	game = Game(5, 'GUI')
+	game.simulate(sys.argv[1])
 
