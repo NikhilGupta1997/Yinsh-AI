@@ -21,12 +21,13 @@ TEMPLATE_ENVIRONMENT = Environment(
 def render_template(template_filename, context):
 	return TEMPLATE_ENVIRONMENT.get_template(template_filename).render(context)
  
-def create_index_html(size, rings, rows):
+def create_index_html(size, rings, rows, seq):
 	fname = "Yinsh.html"
 	context = {
 		'size': size,
 		'rings': rings,
-		'rows': rows
+		'rows': rows,
+		'seq': seq
 	}
 	with open(fname, 'w') as f:
 		html = render_template('index.html', context)
@@ -34,7 +35,7 @@ def create_index_html(size, rings, rows):
 
 class Game:
 
-	def __init__(self, n, mode='CUI', time=120):
+	def __init__(self, n, seq, mode='CUI', time=120):
 		if n in board_sizes:
 			self.rings = int(n)
 			self.board_size = board_sizes[n]
@@ -43,7 +44,7 @@ class Game:
 			raise AssertionError("Number of rings must be either 5, 6 or 7")
 		
 		# Setup Driver
-		create_index_html(self.display_size, n, self.board_size)
+		create_index_html(self.display_size, n, self.board_size, seq)
 		chrome_options = Options()
 		chrome_options.add_argument("--disable-infobars")
 		if mode != 'GUI':
@@ -231,6 +232,6 @@ class Game:
 				exec("self.execute_move(\"" + out['data'] + "\")")
 
 if __name__ == "__main__":
-	game = Game(5, 'GUI')
+	game = Game(6, 6, 'GUI')
 	game.simulate(sys.argv[1])
 

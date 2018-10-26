@@ -2,6 +2,7 @@
 var size = parseInt(document.currentScript.getAttribute('size'));
 var rings = parseInt(document.currentScript.getAttribute('rings'));
 var rows = parseInt(document.currentScript.getAttribute('rows'));
+var seq = parseInt(document.currentScript.getAttribute('seq'));
 var dimension = [ size , size ];
 
 var game_canvas = document.getElementById('GameBoard');
@@ -340,11 +341,11 @@ function RemoveBlackGuides(xring,yring,destx,desty,asign,bsign){
 
 function CheckRows(){
 	for(var i=0;i<rows;i++){
-		for(var j=0;j+rings-1<11;j++){
+		for(var j=0;j+seq-1<11;j++){
 			if(Math.abs(positions[i][j].piece)!=1||positions[i][j].x==-1)
 				continue;
 			var isrow=true;
-			for(var k=1;k<=rings-1;k++){
+			for(var k=1;k<=seq-1;k++){
 				if(positions[i][j].piece!=positions[i][j+k].piece||positions[i][j+k].x==-1||j+k>=rows){
 					isrow=false;
 					break;
@@ -359,21 +360,21 @@ function CheckRows(){
 				row_player++;
 			}
 			var list = [];
-			for(var k=0;k<rings;k++){
+			for(var k=0;k<seq;k++){
 				list.push([i,j+k])
 			}
 			player[row_player].five_row.push(list)
 			// player[row_player].five_row.push([[i,j],[i,j+1],[i,j+2],[i,j+3],[i,j+4]]);
-			// player[row_player].five_row.push([[i, j+k] for k in range(rings)]);
+			// player[row_player].five_row.push([[i, j+k] for k in range(seq)]);
 			 
 		}
 	}
-	for(var i=0;i+rings-1<rows;i++){
+	for(var i=0;i+seq-1<rows;i++){
 		for(var j=0;j<rows;j++){
 			if(Math.abs(positions[i][j].piece)!=1||positions[i][j].x==-1)
 				continue;
 			var isrow=true;
-			for(var k=1;k<=rings-1;k++){
+			for(var k=1;k<=seq-1;k++){
 				if(positions[i][j].piece!=positions[i+k][j].piece||positions[i+k][j].x==-1||i+k>=rows){
 					isrow=false;
 					break;
@@ -389,11 +390,11 @@ function CheckRows(){
 			}
 			// player[row_player].five_row.push([[i,j],[i+1,j],[i+2,j],[i+3,j],[i+4,j]]);
 			var list = [];
-			for(var k=0;k<rings;k++){
+			for(var k=0;k<seq;k++){
 				list.push([i+k,j])
 			}
 			player[row_player].five_row.push(list)
-			// player[row_player].five_row.push([[i+k, j] for k in range(rings)]);
+			// player[row_player].five_row.push([[i+k, j] for k in range(seq)]);
 			
 		}
 	}
@@ -402,7 +403,7 @@ function CheckRows(){
 			if(Math.abs(positions[i][j].piece)!=1||positions[i][j].x==-1)
 				continue;
 			var isrow=true;
-			for(var k=1;k<=rings-1;k++){
+			for(var k=1;k<=seq-1;k++){
 				if(i+k>=rows||j+k>=rows||positions[i][j].piece!=positions[i+k][j+k].piece||positions[i+k][j+k].x==-1){
 					isrow=false;
 					break;
@@ -418,11 +419,11 @@ function CheckRows(){
 			}
 			// player[row_player].five_row.push([[i,j],[i+1,j+1],[i+2,j+2],[i+3,j+3],[i+4,j+4]]);
 			var list = [];
-			for(var k=0;k<rings;k++){
+			for(var k=0;k<seq;k++){
 				list.push([i+k,j+k])
 			}
 			player[row_player].five_row.push(list)
-			// player[row_player].five_row.push([[i+k, j+k] for k in range(rings)]);
+			// player[row_player].five_row.push([[i+k, j+k] for k in range(seq)]);
 			
 		}
 	}
