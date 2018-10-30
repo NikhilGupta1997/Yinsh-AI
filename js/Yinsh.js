@@ -434,7 +434,7 @@ function HighlightRow(state=3){
 	guide_ctx.clearRect(0, 0, guide_canvas.width, guide_canvas.height);
 	if(player[current_player].five_row.length!=0){
 		for(var i=0;i<player[current_player].five_row.length;i++){
-			for(var j=0;j<rings;j++){
+			for(var j=0;j<seq;j++){
 				var xindex=player[current_player].five_row[i][j][0];
 				var yindex=player[current_player].five_row[i][j][1];
 
@@ -498,8 +498,8 @@ function RemoveRow(x, y, state=4){
 	for(var i=0;i<player[current_player].five_row.length;i++){
         firstPointX = player[current_player].five_row[i][0][0];
         firstPointY = player[current_player].five_row[i][0][1];
-        lastPointX = player[current_player].five_row[i][rings-1][0];
-        lastPointY = player[current_player].five_row[i][rings-1][1];
+        lastPointX = player[current_player].five_row[i][seq-1][0];
+        lastPointY = player[current_player].five_row[i][seq-1][1];
         
         if(matchPoints(x, y, firstPointX, firstPointY) || matchPoints(x, y, lastPointX, lastPointY)) {
             if(state == 4) {
@@ -523,8 +523,8 @@ function RemoveRowEnd(startX, startY, endX, endY, state=4){
 	for(var i=0;i<player[current_player].five_row.length;i++){
         firstPointX = player[current_player].five_row[i][0][0];
         firstPointY = player[current_player].five_row[i][0][1];
-        lastPointX = player[current_player].five_row[i][rings-1][0];
-        lastPointY = player[current_player].five_row[i][rings-1][1];
+        lastPointX = player[current_player].five_row[i][seq-1][0];
+        lastPointY = player[current_player].five_row[i][seq-1][1];
         
         if((matchPoints(startX, startY, firstPointX, firstPointY) && matchPoints(endX, endY, lastPointX,
                     lastPointY)) || (matchPoints(startX, startY, lastPointX, lastPointY) &&
@@ -538,7 +538,7 @@ function RemoveRowEnd(startX, startY, endX, endY, state=4){
         var removeList = new Array();
         removeList.push(select_row);
 
-		for(var k=0;k<rings;k++){
+		for(var k=0;k<seq;k++){
 			var xclear=player[current_player].five_row[select_row][k][0];
 			var yclear=player[current_player].five_row[select_row][k][1];
 			piece_ctx.clearRect(positions[xclear][yclear].x-altitude/1.9, positions[xclear][yclear].y-altitude/1.9
@@ -549,7 +549,7 @@ function RemoveRowEnd(startX, startY, endX, endY, state=4){
 				if(i==select_row){
 					continue;
 				}
-				for(var j=0;j<rings;j++){
+				for(var j=0;j<seq;j++){
 					if(player[current_player].five_row[i][j][0]==player[current_player].five_row[select_row][k][0]
 						&&player[current_player].five_row[i][j][1]==player[current_player].five_row[select_row][k][1]){
                             removeList.push(i);
