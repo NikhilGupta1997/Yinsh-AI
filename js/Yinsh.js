@@ -341,7 +341,7 @@ function RemoveBlackGuides(xring,yring,destx,desty,asign,bsign){
 
 function CheckRows(){
 	for(var i=0;i<rows;i++){
-		for(var j=0;j+seq-1<11;j++){
+		for(var j=0;j+seq-1<rows;j++){
 			if(Math.abs(positions[i][j].piece)!=1||positions[i][j].x==-1)
 				continue;
 			var isrow=true;
