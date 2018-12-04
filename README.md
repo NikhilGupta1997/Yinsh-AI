@@ -1,6 +1,15 @@
 # Yinsh
 Simulator supporting smart agents and a user interface for Yinsh, an abstract strategy board game.
 
+## Details
+This is a course assignment for the graduate-level Artificial Intelligence course taught by [**Prof. Mausam**](http://homes.cs.washington.edu/~mausam).  
+The assignment documentation can be found [here](statement.pdf)
+
+### Teaching Assistants
++ [Nikhil Gupta](https://github.com/NikhilGupta1997)
++ [Kolluru Sai Keshav](https://github.com/SaiKeshav)
++ [Rishubh Singh](https://github.com/13dexter)
+
 ## Rules
 The rules of the game can be found [here](http://www.gipf.com/yinsh/rules/rules.html)
 
@@ -21,6 +30,7 @@ The rules of the game can be found [here](http://www.gipf.com/yinsh/rules/rules.
   > `port` (mandatory) - The Server Port.  
   > `ip` (optional) - The Server IP. Default: 0.0.0.0   
   > `n` (optional) - The Board Size. Default: 5  
+  > `s` (optional) - Sequence Length. Default: 5  
   > `NC` (optional) - Number of Clients. Default: 2  
   > `TL` (optional) - Time Limit. Default:150  
   > `LOG` (optional) - The Log File.  
@@ -28,7 +38,7 @@ The rules of the game can be found [here](http://www.gipf.com/yinsh/rules/rules.
 ## Run Instructions
 Here are the sample instructions used to match two random players against each other over the server network.
 ### Setup Server
-`python server.py 10000 -n 5 -NC 2 -TL 150 -LOG server.log`
+`python server.py 10000 -n 5 -s 5 -NC 2 -TL 150 -LOG server.log`
 ### Setup Client 1
 `python  client.py 0.0.0.0 10000 RandomPlayer.py -mode GUI`
 ### Setup Client 2
@@ -108,6 +118,6 @@ Player 2 has removed 1 ring and has 17 markers left on the board.
 Player 1 score will be: **9.012**  
 Player 2 score will be: **1.017**  
 
-Note) Incase a player suffers a TIMEOUT, he will automatically lose the gane and it will count as a (0-3) defeat towards the player and a (3-0) win for the opponent.
+Note) Incase a player suffers a TIMEOUT or INVALID move, he/she will automatically lose the gane and it will count as a (*x*-3) defeat towards the player and a (3-*x*) win for the opponent, where *x* is the number of rings already picked up by the player.
 
 
